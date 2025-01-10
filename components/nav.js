@@ -12,12 +12,12 @@ const links = [
 export default function Nav() {
     const {theme, setTheme} = useTheme()
     useEffect(() => {
-        console.log('Made by Sarthak Mohanty. All Rights Reserved. Want to hire me? https://srtk.me')
+        console.log('Made with <3 by Sahiti Dasari. All Rights Reserved. https://sahiti.dev')
     })
     return (
         <nav className="dark:text-white">
             <ul className="flex flex-wrap sm:justify-between items-start sm:items-center p-8 mt-6 sm:mt-0">
-                <li>Perfect Next.js Theme</li>
+                <li>8 Minutes</li>
                 <ul className={`mx-auto sm:mx-0 flex flex-row space-x-5`}>
                     {links.map(({ href, label }) => (
                         <li className="self-center" key={`${href}${label}`}>

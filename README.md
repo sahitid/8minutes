@@ -1,14 +1,4 @@
-# Perfect
-The best Next.js boilerplate ever.
-# What does this have?
-- Tailwind CSS (no more going through the installation guide!) - for styling components easily
-- `next-themes` (@pacocoursey) - for going to the dark side
-- `swr` (@vercel) - for fetching constantly mutating data
-  - `fetcher.js` so you don't have to keep writing return functions
-- `framer-motion` - for making interactive components and eye-catching animations
-- `react-icons` - for including your favorite icon packs without increasing bundle size significantly. Tree shaking included.
-- `classnames` - for conditionally applying classes to components
-- `react-wrap-balancer` - for balancing text widths for titles and paragraphs
-- `tailwind-merge` - for merging Tailwind class names
+# 8 Minutes
+It only takes 8 minutes with a friend to feel less alone. Our platform pairs strangers together for short, impactful conversations. Connect with someone new, share experiences, and foster a sense of belonging—all in just eight minutes.
 
-&copy; 2021 Sarthak Mohanty. Licensed under the [Unlicense](LICENSE) from Mozilla.
+&copy; 2025 Sahiti Dasari. 
