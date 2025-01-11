@@ -7,10 +7,9 @@ export default function Home() {
       <HeadObject />
       <Nav />
       <main className="flex-1 flex flex-col items-center justify-center text-center">
-        <h1 className="text-8xl font-bold">8</h1>
-        <p className="text-2xl mt-2">minutes</p>
+        <h1 className="text-9xl font-bold">8</h1>
+        <p className="text-4xl mt-2">minutes</p>
 
-        {/* Updated Slower Bouncing Arrow */}
         <div className="mt-8">
           <a href="#next-section" className="flex justify-center items-center animate-bounce-slow">
             <svg
@@ -26,8 +25,9 @@ export default function Home() {
         </div>
 
         <div className="mt-10">
-          <p className="text-2xl italic">"just 8 minutes with a friend to feel less</p>
-          <p className="text-2xl font-bold">alone"</p>
+          <p className="text-3xl italic">"just 8 minutes with</p>
+          <p className="text-3xl italic">a friend to feel less</p>
+          <p className="text-5xl font-bold">alone"</p>
         </div>
 
         <div className="mt-12">
