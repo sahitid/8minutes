@@ -1,47 +1,38 @@
-import Link from 'next/link'
-import { useEffect } from 'react'
-import { CgDarkMode } from 'react-icons/cg'
-import {useTheme} from 'next-themes'
+import Link from 'next/link';
 
 const links = [
-    { label: "Page 1", href: "/" },
-    { label: "Page 2", href: "/" },
-    { label: "Page 3", href: "/" },
-]
+  { label: 'home', href: '/' },
+  { label: 'about us', href: '/about' },
+  { label: 'how it works', href: '/how-it-works' },
+  { label: 'volunteer', href: '/volunteer' },
+  { label: 'sign in', href: '/sign-in' },
+];
 
 export default function Nav() {
-    const {theme, setTheme} = useTheme()
-    useEffect(() => {
-        console.log('Made with <3 by Sahiti Dasari. All Rights Reserved. https://sahiti.dev')
-    })
-    return (
-        <nav className="dark:text-white">
-            <ul className="flex flex-wrap sm:justify-between items-start sm:items-center p-8 mt-6 sm:mt-0">
-                <li>8 Minutes</li>
-                <ul className={`mx-auto sm:mx-0 flex flex-row space-x-5`}>
-                    {links.map(({ href, label }) => (
-                        <li className="self-center" key={`${href}${label}`}>
-                            <Link
-                                href={href}
-                                className={`font-inter px-4 py-2 rounded hover:bg-black dark:hover:bg-white hover:bg-opacity-10 dark:hover:bg-opacity-10`}>
+  return (
+    <nav className="flex items-center justify-between w-full px-8 py-4">
+      {/* Left-Aligned Logo */}
+      <div className="text-lg font-bold absolute left-8">
+        <Link href="/">8</Link>
+      </div>
 
-                                {label}
-
-                            </Link>
-                        </li>
-                    ))}
-                    <li>
-                        <button
-                            onClick={() => {
-                                setTheme(theme === 'dark' ? 'light' : 'dark');
-                                document.querySelector("#theme_toggle").classList.toggle("rotate-180");
-                            }}
-                            className="p-2 rounded-full hover:bg-black dark:hover:bg-white hover:bg-opacity-10 dark:hover:bg-opacity-10 transform duration-200" id="theme_toggle">
-                            <CgDarkMode size={24} />
-                        </button>
-                    </li>
-                </ul>
-            </ul>
-        </nav>
-    );
+      {/* Centered Navigation Links */}
+      <ul className="flex items-center text-sm mx-auto">
+        {links.map(({ href, label }, index) => (
+          <li key={href} className="flex items-center">
+            <Link
+              href={href}
+              className="hover:underline hover:text-gray-700 dark:hover:text-gray-300 transition"
+            >
+              {label}
+            </Link>
+            {/* Add separator except for the last link */}
+            {index < links.length - 1 && (
+              <span className="inline-block px-2">|</span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
 }
