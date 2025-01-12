@@ -8,7 +8,7 @@ export const HowItWorks = () => {
               <p>1</p>
             </div>
             <p className="text-2xl max-w-xl">
-              Fill out a quick 1-minute survey about what you're looking for in a conversation.
+              fill out a quick 1-minute survey about what you're looking for in a conversation.
             </p>
           </div>
           <div className="flex items-center">
@@ -16,15 +16,15 @@ export const HowItWorks = () => {
               <p>2</p>
             </div>
             <p className="text-2xl max-w-xl">
-              Get matched with a stranger & talk about anything. It’s your moment to connect and share—for 8 minutes.
+              get matched with a stranger & talk about anything. it’s your moment to connect and share—for 8 minutes.
             </p>
           </div>
           <div className="flex items-center">
             <div className="flex items-center justify-center w-12 h-12 bg-black text-white text-xl font-bold rounded-full mr-6">
               <p>3</p>
             </div>
-            <button className="max-w-xl border-2 border-black py-3 px-6 text-xl rounded hover:bg-gray-200 transition">
-              Get started
+            <button className="max-w-xl border-2 border-black py-3 px-6 text-xl rounded hover:bg-black hover:text-white transition ease-in-out duration-300">
+              get started
             </button>
           </div>
         </div>
