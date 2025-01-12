@@ -32,7 +32,12 @@ export default function Home() {
         <HowItWorks />
       </div>
     </div>
+
+    <div>
+      <p className="text-1xl items-center justify-center text-center mb-3">made with 🖤</p>
+    </div>    
     </ReactLenis>
+    
   );
 }
 
