@@ -15,7 +15,7 @@ export default function Home() {
           <span className="text-[14rem] font-bold leading-none">8</span>
           <p className="text-5xl">minutes</p>
           <div className="mt-12">
-            <button className="bg-transparent border hover:bg-black hover:text-white transition ease-in-out duration-300 border-black dark:border-white py-2 px-4 rounded text-lg hover:bg-gray-200 dark:hover:bg-gray-800 transition">
+            <button className="max-w-xl border-2 border-black py-3 px-6 text-xl rounded hover:bg-black hover:text-white transition ease-in-out duration-300">
               get started
             </button>
           </div>
