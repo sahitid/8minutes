@@ -25,10 +25,10 @@ export default function Home() {
           className="w-[30%] scale-x-[-1] translate-y-[5vh]"
         />
       </main>
-      <div className="w-full flex justify-center pb-[10vh]">
+      <div id="about" className="w-full flex justify-center pb-[10vh]">
         <About />
       </div>
-      <div className="w-full flex justify-center h-screen">
+      <div id="how-it-works" className="w-full flex justify-center h-screen">
         <HowItWorks />
       </div>
     </div>

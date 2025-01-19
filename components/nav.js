@@ -1,11 +1,17 @@
 import Link from 'next/link';
+import {
+  ClerkProvider,
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
 
 const links = [
-  { label: 'home', href: '/' },
-  { label: 'about us', href: '/about' },
-  { label: 'how it works', href: '/how-it-works' },
-  { label: 'volunteer', href: '/volunteer' },
-  { label: 'sign in', href: '/sign-in' },
+  { label: "home", href: "/" },
+  { label: "about us", href: "#about" },
+  { label: "how it works", href: "#how-it-works" },
+  // { label: 'sign in', href: '/sign-in' },
 ];
 
 export default function Nav() {
@@ -24,11 +30,20 @@ export default function Nav() {
             >
               {label}
             </Link>
-            {index < links.length - 1 && (
-              <span className="inline-block px-2">|</span>
-            )}
+
+            <span className="inline-block px-2">|</span>
+
           </li>
         ))}
+        <li>
+          <SignedOut>
+            <SignInButton >sign in</SignInButton>
+          </SignedOut>
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
+        </li>
+
       </ul>
     </nav>
   );
