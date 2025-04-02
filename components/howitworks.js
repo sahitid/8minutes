@@ -23,7 +23,7 @@ export const HowItWorks = () => {
           <div className="flex items-center justify-center w-12 h-12 bg-black text-white text-xl font-bold rounded-full mr-6">
             <p>3</p>
           </div>
-          <a href="/chat" className="max-w-xl border-2 border-black py-3 px-6 text-xl rounded hover:bg-black hover:text-white transition ease-in-out duration-300">
+          <a href="/survey" className="max-w-xl border-2 border-black py-3 px-6 text-xl rounded hover:bg-black hover:text-white transition ease-in-out duration-300">
             get started
           </a>
         </div>

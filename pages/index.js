@@ -16,7 +16,7 @@ export default function Home() {
             <span className="text-[14rem] font-bold leading-none">8</span>
             <p className="text-5xl">minutes</p>
             <div className="mt-12">
-              <a href="/chat" className="max-w-xl border-2 border-black py-3 px-6 text-xl rounded hover:bg-black hover:text-white transition ease-in-out duration-300">
+              <a href="/survey" className="max-w-xl border-2 border-black py-3 px-6 text-xl rounded hover:bg-black hover:text-white transition ease-in-out duration-300">
                 get started
               </a>
             </div>
