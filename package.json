@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.9.14",
+    "@tailwindcss/postcss": "^4.1.1",
     "classnames": "^2.3.2",
     "framer-motion": "^11.0.3",
     "lenis": "^1.1.19",
