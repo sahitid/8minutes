@@ -4,7 +4,7 @@ type answer = {
 	answer: string | string[], 
 	id?: string
 }
-export default  async (req: NextApiRequest , res:NextApiResponse<ResponseData>) => {
+export default  async (req, res) => {
 
 	if(req.method ==="POST")
 	{
