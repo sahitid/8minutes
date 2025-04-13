@@ -43,18 +43,19 @@ function change_func(val, func, next)
 }
 async function submit_form(questions)
 {
-		questions.map(({answer, id})=> {
+	for( const {answer, id } of questions){
 		if(!answer || (Array.isArray(answer) && answer.length != 2) ){
-		
+			console.log(  !answer ||Array.isArray(answer) && answer.length !== 2 )
 			lenis?.scrollTo(id);
-			return null; 
-		}})
+			return; 
+		}
+	}
 		const ret = await fetch("/api/survey",{
 		method: "POST",
-		body: JSON.stringify({submission: questions})
+		body: JSON.stringify({submission: questions, username: user.username})
 		}) 
-				
-} 
+	router.push("chat")
+	}			
   useEffect( ()=> {
 	if( isLoaded && !isSignedIn ){
 	  console.log(`isSigned = ${isSignedIn} \n isLoaded = ${isLoaded}`)
@@ -120,7 +121,7 @@ if (!isLoaded || !isSignedIn) return null
 	  		</div>
 	  	</div>
 		</div>
-	  	<button class="bg-white text-black self-center p-4" onClick={(e ) => submit_form(input_form) }>continue</button>
+	  	<button class="bg-white text-black self-center p-4" onClick={async (e ) => await submit_form(input_form) }>continue</button>
 	  	</div>
 	  
       </main>
