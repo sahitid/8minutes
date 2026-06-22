@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PROTECTED_PREFIXES = ["/account", "/survey", "/listen", "/chat"];
+const PROTECTED_PREFIXES = ["/account", "/survey", "/listen", "/chat", "/waiting"];
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });

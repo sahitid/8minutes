@@ -210,6 +210,55 @@ async function run() {
   // Idempotency: ending again must not double-credit.
   await admin.rpc("app_end_conversation", { p_conversation: conversationId, p_user: listenerId });
   assert("ending again does not double-credit", (await getCredits(listenerId)) === 2);
+
+  console.log("\n=== Integration: envelope board (drop -> browse -> open) ===");
+  const dropperPhone = `+1500${rand}0004`;
+  const openerPhone = `+1500${rand}0005`;
+  const dropperId = await makeUser(dropperPhone, "dropper-test");
+  const openerId = await makeUser(openerPhone, "opener-test");
+  await setSurvey(dropperId, "vent", "lonely", ["topic:life", "vibe:supportive", "pref:talk", "depth:medium"]);
+
+  // Dropper posts an open envelope (recipient_id == sender_id sentinel).
+  const { data: envelope } = await admin
+    .from("talk_requests")
+    .insert({ sender_id: dropperId, recipient_id: dropperId, is_anonymous: true, status: "pending" })
+    .select("id")
+    .single();
+  assert("envelope dropped into the board", !!envelope?.id);
+
+  // Board query: open, unclaimed, not mine.
+  const { data: board } = await admin
+    .from("talk_requests")
+    .select("id, sender_id, recipient_id, status")
+    .eq("status", "pending");
+  const openForOpener = (board || []).filter(
+    (r) => r.recipient_id === r.sender_id && r.sender_id !== openerId
+  );
+  assert("opener can see the dropped envelope on the board", openForOpener.some((r) => r.id === envelope.id));
+
+  // Opener opens the envelope -> starts a conversation.
+  const { data: convB, error: convBErr } = await admin.rpc("app_create_match", {
+    p_talker: dropperId,
+    p_listener: openerId,
+  });
+  assert("opening envelope creates a conversation", !!convB, convBErr?.message);
+  await admin
+    .from("talk_requests")
+    .update({ recipient_id: openerId, status: "accepted", conversation_id: convB })
+    .eq("id", envelope.id);
+
+  assert("dropper was charged 1 credit when opened", (await getCredits(dropperId)) === 0);
+
+  const { data: claimed } = await admin
+    .from("talk_requests")
+    .select("status, recipient_id, conversation_id")
+    .eq("id", envelope.id)
+    .single();
+  assert("envelope marked accepted + linked to conversation", claimed?.status === "accepted" && claimed?.conversation_id === convB && claimed?.recipient_id === openerId);
+
+  // It should no longer be an open board item.
+  const stillOpen = claimed?.recipient_id === dropperId;
+  assert("opened envelope leaves the board", stillOpen === false);
 }
 
 async function cleanup() {

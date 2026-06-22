@@ -166,22 +166,26 @@ export default function Survey() {
       return;
     }
 
-    const matchRes = await fetch("/api/match", { method: "POST" });
-    const matchData = await matchRes.json().catch(() => ({}));
+    const showUsername =
+      typeof window !== "undefined" &&
+      localStorage.getItem("showUsernameOnRequests") === "1";
+
+    const dropRes = await fetch("/api/requests", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ is_anonymous: !showUsername }),
+    });
+    const dropData = await dropRes.json().catch(() => ({}));
     setSubmitting(false);
-    if (matchRes.status === 402) {
+    if (dropRes.status === 402) {
       setSubmitError("you need at least 1 credit to talk. earn one by listening!");
       return;
     }
-    if (matchRes.status === 409) {
-      setSubmitError("no listeners are online right now. try again in a moment 🌙");
+    if (!dropRes.ok || !dropData.request_id) {
+      setSubmitError(dropData.error || "could not send your envelope, please try again");
       return;
     }
-    if (!matchRes.ok || !matchData.conversation_id) {
-      setSubmitError(matchData.error || "matching failed, please try again");
-      return;
-    }
-    router.push(`/chat/${matchData.conversation_id}`);
+    router.push("/waiting");
   }
 
   useEffect(() => {
@@ -277,7 +281,7 @@ export default function Survey() {
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, marginTop: 40 }}>
               {submitError ? <p style={{ color: "#E58A8A", fontSize: 14.5, fontWeight: 700, textAlign: "center" }}>{submitError}</p> : null}
               <button disabled={submitting} className="doodle-btn" style={{ fontSize: 21, padding: "15px 30px" }} onClick={submitForm}>
-                {submitting ? "finding your match..." : "find my match →"}
+                {submitting ? "sending your envelope..." : "send my envelope 💌"}
               </button>
             </div>
           </div>
