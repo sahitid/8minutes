@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import HeadObject from "../components/head";
 import Nav from "../components/nav";
@@ -23,20 +23,73 @@ function HeroEightBall() {
   );
 }
 
-/* Decorative tin-can phone running down the whole page (two cups joined by a
-   long wavy dashed "talking" string). Lives behind the content. */
+/* A draggable paper cup. Grab it and move it around. */
+function DraggableCup({ base, variant, fill, wave }) {
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const drag = useRef(null);
+
+  function onPointerDown(e) {
+    e.preventDefault();
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch {}
+    drag.current = { sx: e.clientX, sy: e.clientY, ox: offset.x, oy: offset.y };
+  }
+  function onPointerMove(e) {
+    if (!drag.current) return;
+    setOffset({
+      x: drag.current.ox + (e.clientX - drag.current.sx),
+      y: drag.current.oy + (e.clientY - drag.current.sy),
+    });
+  }
+  function onPointerUp(e) {
+    drag.current = null;
+    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch {}
+  }
+
+  return (
+    <div
+      className="tincan-doodle"
+      style={{
+        position: "absolute",
+        ...base,
+        width: 76,
+        height: 84,
+        zIndex: 4,
+        cursor: "grab",
+        touchAction: "none",
+        transform: `translate(${offset.x}px, ${offset.y}px)`,
+      }}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+      aria-hidden="true"
+    >
+      <svg width="76" height="84" viewBox="0 0 76 84" fill="none" style={{ pointerEvents: "none" }}>
+        {variant === "top" ? (
+          <>
+            <path d="M20 78 L56 78 L50 30 L26 30 Z" fill={fill} stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
+            <ellipse cx="38" cy="30" rx="14" ry="6" fill="#fff" stroke={INK} strokeWidth="4.5" />
+            <path d="M60 40 q9 -5 0 -14 M67 46 q16 -8 0 -22" stroke={wave} strokeWidth="3" fill="none" strokeLinecap="round" />
+          </>
+        ) : (
+          <>
+            <path d="M20 6 L56 6 L50 54 L26 54 Z" fill={fill} stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
+            <ellipse cx="38" cy="54" rx="14" ry="6" fill="#fff" stroke={INK} strokeWidth="4.5" />
+            <path d="M60 44 q9 -5 0 -14 M67 50 q16 -8 0 -22" stroke={wave} strokeWidth="3" fill="none" strokeLinecap="round" />
+          </>
+        )}
+      </svg>
+    </div>
+  );
+}
+
+/* Decorative tin-can phone running down the whole page. The string is static;
+   the two cups can be grabbed and dragged. */
 function TinCanDoodle() {
   return (
-    <div className="tincan-doodle" style={{ position: "absolute", top: 0, bottom: 0, left: 22, width: 76, zIndex: 0, pointerEvents: "none" }} aria-hidden="true">
-      {/* top cup */}
-      <svg width="76" height="84" viewBox="0 0 76 84" fill="none" style={{ position: "absolute", top: 92, left: 0 }}>
-        <path d="M20 78 L56 78 L50 30 L26 30 Z" fill="#FCE7C8" stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
-        <ellipse cx="38" cy="30" rx="14" ry="6" fill="#fff" stroke={INK} strokeWidth="4.5" />
-        {/* little sound waves */}
-        <path d="M60 40 q9 -5 0 -14 M67 46 q16 -8 0 -22" stroke="#E58A8A" strokeWidth="3" fill="none" strokeLinecap="round" style={{ animation: "blink 2.2s ease-in-out infinite" }} />
-      </svg>
-      {/* long wavy dashed string */}
-      <div style={{ position: "absolute", top: 176, bottom: 176, left: 0, width: 76 }}>
+    <>
+      {/* static wavy string, behind the content */}
+      <div className="tincan-doodle" style={{ position: "absolute", top: 176, bottom: 176, left: 22, width: 76, zIndex: 0, pointerEvents: "none" }} aria-hidden="true">
         <svg width="76" height="100%" viewBox="0 0 76 1000" preserveAspectRatio="none" fill="none">
           <path
             d="M38 0 C10 80 66 150 38 230 C12 300 64 380 38 460 C12 540 66 620 38 700 C12 780 64 860 38 1000"
@@ -44,17 +97,13 @@ function TinCanDoodle() {
             strokeWidth="3.5"
             strokeLinecap="round"
             strokeDasharray="10 10"
-            style={{ animation: "dashmove 6s linear infinite" }}
           />
         </svg>
       </div>
-      {/* bottom cup */}
-      <svg width="76" height="84" viewBox="0 0 76 84" fill="none" style={{ position: "absolute", bottom: 92, left: 0 }}>
-        <path d="M20 6 L56 6 L50 54 L26 54 Z" fill="#D6E8D5" stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
-        <ellipse cx="38" cy="54" rx="14" ry="6" fill="#fff" stroke={INK} strokeWidth="4.5" />
-        <path d="M60 44 q9 -5 0 -14 M67 50 q16 -8 0 -22" stroke="#9CC79A" strokeWidth="3" fill="none" strokeLinecap="round" style={{ animation: "blink 2.2s ease-in-out infinite .5s" }} />
-      </svg>
-    </div>
+      {/* draggable cups, above the content */}
+      <DraggableCup base={{ top: 92, left: 22 }} variant="top" fill="#FCE7C8" wave="#E58A8A" />
+      <DraggableCup base={{ bottom: 92, left: 22 }} variant="bottom" fill="#D6E8D5" wave="#9CC79A" />
+    </>
   );
 }
 
