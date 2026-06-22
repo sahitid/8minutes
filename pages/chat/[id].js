@@ -7,6 +7,14 @@ import { useSupabase } from "../../lib/supabase/context";
 
 const INK = "#1a1a1a";
 
+const HOUSE_RULES = [
+  { emoji: "🌷", text: "be kind. this is someone's real moment." },
+  { emoji: "👂", text: "listen first. let them feel heard." },
+  { emoji: "🔒", text: "stay anonymous. no names, numbers, or addresses." },
+  { emoji: "🚫", text: "no hate, harassment, or threats. ever." },
+  { emoji: "🚪", text: "you can leave or report anytime you feel unsafe." },
+];
+
 function formatTime(seconds) {
   const s = Math.max(0, Math.floor(seconds));
   const m = Math.floor(s / 60);
@@ -26,7 +34,20 @@ export default function ChatRoom() {
   const [ended, setEnded] = useState(false);
   const [reported, setReported] = useState(false);
   const [error, setError] = useState("");
+  const [rulesAccepted, setRulesAccepted] = useState(false);
   const scrollRef = useRef(null);
+
+  useEffect(() => {
+    if (!id) return;
+    if (typeof window !== "undefined" && localStorage.getItem(`rules:${id}`)) {
+      setRulesAccepted(true);
+    }
+  }, [id]);
+
+  function acceptRules() {
+    if (id && typeof window !== "undefined") localStorage.setItem(`rules:${id}`, "1");
+    setRulesAccepted(true);
+  }
 
   const endConversation = useCallback(async () => {
     if (!id) return;
@@ -152,6 +173,26 @@ export default function ChatRoom() {
             </div>
           </div>
 
+          {!rulesAccepted && !ended ? (
+            <div style={{ flex: 1, overflowY: "auto", padding: "26px 22px", display: "flex", flexDirection: "column" }}>
+              <h3 className="marker" style={{ fontSize: 22, margin: "0 0 4px", textAlign: "center" }}>house rules 🏡</h3>
+              <p style={{ textAlign: "center", color: "#5a5a5a", fontSize: 14, margin: "0 0 18px", fontWeight: 700 }}>
+                eight minutes, one stranger. let&apos;s make it a good one.
+              </p>
+              <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
+                {HOUSE_RULES.map((r) => (
+                  <li key={r.text} style={{ display: "flex", alignItems: "center", gap: 12, border: `2.5px solid ${INK}`, borderRadius: 14, padding: "12px 14px", background: "#FBF8F3", boxShadow: `3px 3px 0 #FCE7C8` }}>
+                    <span style={{ fontSize: 22 }}>{r.emoji}</span>
+                    <span style={{ fontSize: 14.5, fontWeight: 700 }}>{r.text}</span>
+                  </li>
+                ))}
+              </ul>
+              <button onClick={acceptRules} className="doodle-btn" style={{ marginTop: 18, alignSelf: "center" }}>
+                i&apos;m ready, let&apos;s be kind
+              </button>
+            </div>
+          ) : (
+          <>
           {/* messages */}
           <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", padding: "18px", display: "flex", flexDirection: "column", gap: 12 }}>
             {error ? <p style={{ textAlign: "center", fontSize: 14, color: "#c0392b", fontWeight: 700 }}>{error}</p> : null}
@@ -181,6 +222,8 @@ export default function ChatRoom() {
               <input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="type a message..." className="doodle-input" style={{ flex: 1 }} />
               <button type="submit" className="doodle-btn" style={{ padding: "10px 20px" }}>send</button>
             </form>
+          )}
+          </>
           )}
         </div>
       </main>

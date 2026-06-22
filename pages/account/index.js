@@ -29,6 +29,23 @@ export default function Account() {
   const [bio, setBio] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [showUsername, setShowUsername] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setShowUsername(localStorage.getItem("showUsernameOnRequests") === "1");
+    }
+  }, []);
+
+  function toggleShowUsername() {
+    setShowUsername((prev) => {
+      const next = !prev;
+      if (typeof window !== "undefined") {
+        localStorage.setItem("showUsernameOnRequests", next ? "1" : "0");
+      }
+      return next;
+    });
+  }
 
   const loadProfile = useCallback(async () => {
     const res = await fetch("/api/profile");
@@ -88,11 +105,16 @@ export default function Account() {
     loadEnvelopes();
   }
 
-  async function sendAnonRequest() {
+  async function sendRequest() {
     await fetch("/api/envelopes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ body: "someone would like to talk with you 💌" }),
+      body: JSON.stringify({
+        is_anonymous: !showUsername,
+        body: showUsername
+          ? "i'd love to talk with you 💌"
+          : "someone would like to talk with you 💌",
+      }),
     });
   }
 
@@ -123,10 +145,21 @@ export default function Account() {
         <section className="doodle-card" style={sectionStyle}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, gap: 12, flexWrap: "wrap" }}>
             <h2 className="marker" style={{ fontWeight: 700, fontSize: 22, margin: 0 }}>your envelopes 💌</h2>
-            <button onClick={sendAnonRequest} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'Nunito',sans-serif", fontWeight: 800, fontSize: 14, color: "#E58A8A" }}>
-              + send an anonymous request
-            </button>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 13.5, fontWeight: 700, color: "#5a5a5a", cursor: "pointer" }}>
+                <input type="checkbox" checked={showUsername} onChange={toggleShowUsername} />
+                show my username
+              </label>
+              <button onClick={sendRequest} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'Nunito',sans-serif", fontWeight: 800, fontSize: 14, color: "#E58A8A" }}>
+                + send a request
+              </button>
+            </div>
           </div>
+          <p style={{ fontSize: 12.5, color: "#9a9a90", margin: "-8px 0 14px", fontWeight: 700 }}>
+            {showUsername
+              ? "your display name will be shown on requests you send."
+              : "requests you send stay anonymous (shown as “a stranger”)."}
+          </p>
           {envelopes.length === 0 ? (
             <p style={{ fontSize: 14.5, color: "#5a5a5a", margin: 0 }}>
               no requests yet. when someone wants to talk, their envelope lands here.
