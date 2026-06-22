@@ -1,45 +1,25 @@
+import Link from "next/link";
 import Nav from "../../components/nav";
+import HeadObject from "../../components/head";
 
-export default function Chat() {
+export default function ChatIndex() {
   return (
-    <div className="font-radley dark:text-white dark:bg-black">
+    <div className="doodle-page">
+      <HeadObject />
       <Nav />
-
-      <main className="flex w-full items-center justify-center h-screen">
-        <div className="w-full max-w-xl bg-white dark:bg-black border-2 border-black dark:border-white p-8 rounded-md shadow">
-          <h2 className="text-lg text-center mb-4">
-            send a message to start your conversation:
-          </h2>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              console.log(e.target.message.value);
-            }}
-            className="space-y-4"
-          >
-            <textarea
-              name="message"
-              className="w-full border border-black px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-black dark:text-white dark:border-white"
-              rows="4"
-              required
-            ></textarea>
-            <div className="text-center">
-              <button
-                type="submit"
-                className="px-6 py-2 bg-black text-white rounded hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-300 transition"
-              >
-                chat
-              </button>
-            </div>
-          </form>
+      <main style={{ display: "flex", justifyContent: "center", padding: "80px 20px" }}>
+        <div className="doodle-card" style={{ maxWidth: 460, textAlign: "center", padding: 40, transform: "rotate(-0.5deg)" }}>
+          <div style={{ fontSize: 46, marginBottom: 12 }}>💬</div>
+          <h1 className="marker" style={{ fontWeight: 700, fontSize: 26, margin: "0 0 8px" }}>no active conversation</h1>
+          <p style={{ fontSize: 14.5, color: "#5a5a5a", margin: "0 0 24px" }}>
+            take the quick quiz to get matched with a listener, or wait for an envelope in your account.
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 12 }}>
+            <Link href="/survey" className="doodle-btn">find someone to talk to</Link>
+            <Link href="/account" className="doodle-btn doodle-btn-outline">go to account</Link>
+          </div>
         </div>
       </main>
-
-      <footer className="mt-12">
-        <p className="text-1xl items-center justify-center text-center mb-3">
-          made with 🖤
-        </p>
-      </footer>
     </div>
   );
 }

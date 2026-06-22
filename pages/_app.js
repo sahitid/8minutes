@@ -1,22 +1,15 @@
 import "../styles/globals.css";
 import { ThemeProvider } from "next-themes";
 import { Provider } from "react-wrap-balancer";
-import {
-  ClerkProvider,
-  SignInButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from "@clerk/nextjs";
+import { SupabaseProvider } from "../lib/supabase/context";
 
 function MyApp({ Component, pageProps }) {
   return (
-    <ThemeProvider defaultTheme="system" attribute="class">
+    <ThemeProvider attribute="class" forcedTheme="light">
       <Provider>
-        <ClerkProvider>
-
+        <SupabaseProvider>
           <Component {...pageProps} />
-        </ClerkProvider>
+        </SupabaseProvider>
       </Provider>
     </ThemeProvider>
   );

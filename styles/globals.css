@@ -28,3 +28,124 @@ html.dark {
 
 /* Fixes outline style for inputs on Safari */
 input:focus { outline: none; }
+
+/* ===== 8 Minutes doodly landing ===== */
+html { scroll-behavior: smooth; }
+::selection { background: #FBD5D5; }
+
+@keyframes floatY { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-10px); } }
+@keyframes sway { 0%,100%{ transform: rotate(-2.5deg); } 50%{ transform: rotate(2.5deg); } }
+@keyframes dashmove { to { stroke-dashoffset: -240; } }
+@keyframes sweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes bob { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-8px); } }
+@keyframes popPulse { 0%,100%{ transform: scale(1); } 50%{ transform: scale(1.14); } }
+@keyframes blink { 0%,92%,100%{ opacity: 1; } 96%{ opacity: .25; } }
+@keyframes drawIn { to { stroke-dashoffset: 0; } }
+@keyframes nudge { 0%,100%{ transform: translateX(0); } 50%{ transform: translateX(5px); } }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes wiggle { 0%,100%{ transform: rotate(-5deg); } 50%{ transform: rotate(5deg); } }
+
+/* ===== Shared doodle theme (all screens) ===== */
+.doodle-page {
+  position: relative;
+  min-height: 100vh;
+  background: #FBF8F3;
+  color: #1a1a1a;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 600;
+  overflow-x: hidden;
+}
+.doodle-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(#1a1a1a 1.1px, transparent 1.1px);
+  background-size: 26px 26px;
+  opacity: 0.05;
+}
+.doodle-page > * { position: relative; z-index: 1; }
+.marker { font-family: 'Shantell Sans', cursive; }
+
+.doodle-card {
+  background: #fff;
+  border: 3px solid #1a1a1a;
+  border-radius: 22px 18px 24px 16px;
+  box-shadow: 6px 6px 0 #1a1a1a;
+}
+.doodle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  color: #1a1a1a;
+  background: #FBD5D5;
+  border: 3px solid #1a1a1a;
+  border-radius: 16px 13px 16px 12px;
+  padding: 12px 22px;
+  font-family: 'Shantell Sans', cursive;
+  font-weight: 700;
+  font-size: 18px;
+  box-shadow: 5px 5px 0 #1a1a1a;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.doodle-btn:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #1a1a1a; }
+.doodle-btn:disabled { opacity: .55; cursor: default; transform: none; box-shadow: 5px 5px 0 #1a1a1a; }
+.doodle-btn-outline { background: #fff; }
+.doodle-btn-green { background: #D6E8D5; }
+.doodle-input {
+  width: 100%;
+  background: #fff;
+  border: 2.5px solid #1a1a1a;
+  border-radius: 14px;
+  padding: 12px 16px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: #1a1a1a;
+  box-shadow: 3px 3px 0 #D6E8D5;
+}
+.doodle-input:focus { box-shadow: 3px 3px 0 #FBD5D5; }
+.doodle-input::placeholder { color: #9a9a90; }
+
+.eight-landing { font-family: 'Nunito', sans-serif; }
+.eight-landing .marker { font-family: 'Shantell Sans', cursive; }
+.eight-landing .hard-link { transition: transform .15s ease, box-shadow .15s ease; }
+.eight-landing .hard-link:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #1a1a1a !important; }
+.eight-landing .hard-link-sm:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 #1a1a1a !important; }
+.eight-landing .switch-btn:hover { background: #FBF8F3 !important; }
+.eight-landing .lift-card { transition: transform .18s ease, box-shadow .18s ease; }
+.eight-landing .lift-card:hover { transform: translate(-3px,-3px) rotate(0deg) !important; box-shadow: 10px 10px 0 #1a1a1a !important; }
+.eight-landing .lift-card .step-icon { transition: transform .2s ease; transform-origin: 50% 50%; }
+.eight-landing .lift-card:hover .step-icon { animation: wiggle .5s ease-in-out; }
+.eight-landing .lift-card .step-hint { max-height: 0; opacity: 0; overflow: hidden; transition: max-height .25s ease, opacity .25s ease, margin .25s ease; margin-top: 0; }
+.eight-landing .lift-card:hover .step-hint { max-height: 40px; opacity: 1; margin-top: 12px; }
+
+@media (max-width: 900px) {
+  .eight-landing .hero-grid { grid-template-columns: 1fr !important; text-align: center; }
+  .eight-landing .hero-grid > div { justify-items: center; }
+  .eight-landing .hero-grid > div > div { justify-content: center; }
+  .eight-landing .steps-grid { grid-template-columns: 1fr !important; }
+  .eight-landing .volunteer-grid { grid-template-columns: 1fr !important; text-align: center; }
+  .eight-landing .volunteer-grid p { margin-left: auto; margin-right: auto; }
+}
+@media (max-width: 820px) {
+  .tincan-doodle { display: none; }
+}
+@media (max-width: 700px) {
+  .nav-links-text { display: none !important; }
+}
+@media (max-width: 640px) {
+  /* tighter gutters across the doodle pages on phones */
+  .doodle-page nav { padding-left: 16px !important; padding-right: 16px !important; }
+  .eight-landing header,
+  .eight-landing section,
+  .eight-landing #cta,
+  .eight-landing > footer { padding-left: 18px !important; padding-right: 18px !important; }
+  .volunteer-grid { padding: 34px 22px !important; }
+  .hero-grid { gap: 16px !important; padding-top: 12px !important; }
+  .doodle-page main { padding-left: 14px !important; padding-right: 14px !important; }
+}

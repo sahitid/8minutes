@@ -12,16 +12,11 @@ export default async function handler(req, res) {
   } = await supabase.auth.getUser();
   if (!user) return res.status(401).json({ error: "Unauthorized" });
 
-  const { conversation_type, mood, interests } = req.body || {};
-  if (!conversation_type || !mood || !Array.isArray(interests)) {
-    return res.status(400).json({ error: "Missing survey fields" });
-  }
-
-  const { error } = await supabase.from("survey_responses").insert({
-    user_id: user.id,
-    conversation_type,
-    mood,
-    interests,
+  const { conversation_id, reason } = req.body || {};
+  const { error } = await supabase.from("reports").insert({
+    conversation_id: conversation_id || null,
+    reporter_id: user.id,
+    reason: reason || "unspecified",
   });
   if (error) return res.status(500).json({ error: error.message });
 
