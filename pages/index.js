@@ -268,7 +268,6 @@ export default function Home() {
       {/* ===== HERO ===== */}
       <header id="top" className="hero-grid" style={{ position: "relative", zIndex: 2, maxWidth: 1180, margin: "0 auto", padding: "30px 32px 40px", display: "grid", gridTemplateColumns: "1.05fr 1fr", gap: 40, alignItems: "center" }}>
         <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0 }}>
-          <svg width="58" height="34" viewBox="0 0 58 34" fill="none" style={{ position: "absolute", left: 30, top: 120, animation: "sway 5s ease-in-out infinite" }}><path d="M3 20 C12 4 18 30 27 16 C36 2 42 28 54 12" stroke={INK} strokeWidth="3" strokeLinecap="round" /></svg>
           <svg width="30" height="30" viewBox="0 0 24 24" style={{ position: "absolute", right: 30, top: 60, animation: "popPulse 3.4s ease-in-out infinite" }}><path d="M12 0 C13 8 16 11 24 12 C16 13 13 16 12 24 C11 16 8 13 0 12 C8 11 11 8 12 0Z" fill="#D6E8D5" stroke={INK} strokeWidth="1.6" /></svg>
           <svg width="22" height="22" viewBox="0 0 24 24" style={{ position: "absolute", right: 120, bottom: 30, animation: "popPulse 4.2s ease-in-out infinite .6s" }}><path d="M12 0 C13 8 16 11 24 12 C16 13 13 16 12 24 C11 16 8 13 0 12 C8 11 11 8 12 0Z" fill="#FBD5D5" stroke={INK} strokeWidth="1.6" /></svg>
         </div>
@@ -283,8 +282,9 @@ export default function Home() {
             just{" "}
             <span style={{ position: "relative", whiteSpace: "nowrap" }}>
               8 minutes
-              <svg width="220" height="20" viewBox="0 0 220 20" fill="none" style={{ position: "absolute", left: 0, bottom: -10, width: "100%" }}>
-                <path d="M4 12 C60 3 150 3 216 9" stroke="#E58A8A" strokeWidth="5" strokeLinecap="round" strokeDasharray="240" strokeDashoffset="240" style={{ animation: "drawIn 1.1s ease-out .35s forwards" }} />
+              <svg viewBox="0 0 240 24" fill="none" preserveAspectRatio="none" style={{ position: "absolute", left: "-1%", bottom: -14, width: "102%", height: 18, overflow: "visible" }}>
+                <path d="M6 13 C74 5 168 5 234 11" stroke="#E58A8A" strokeWidth="5.5" strokeLinecap="round" strokeDasharray="280" strokeDashoffset="280" style={{ animation: "drawIn 1.1s ease-out .35s forwards" }} />
+                <path d="M12 19 C82 14 158 14 228 18" stroke="#E58A8A" strokeWidth="3" strokeLinecap="round" opacity="0.55" strokeDasharray="280" strokeDashoffset="280" style={{ animation: "drawIn 1.1s ease-out .5s forwards" }} />
               </svg>
             </span>
             <br />
