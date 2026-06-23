@@ -1,4 +1,5 @@
 import { createServerSupabase } from "../../lib/supabase/server";
+import { supabaseAdmin } from "../../lib/supabase/admin";
 
 export default async function handler(req, res) {
   const supabase = createServerSupabase(req, res);
@@ -19,12 +20,61 @@ export default async function handler(req, res) {
 
     const { data: transactions } = await supabase
       .from("credit_transactions")
-      .select("id, amount, reason, created_at")
+      .select("id, amount, reason, conversation_id, created_at")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(20);
 
-    return res.status(200).json({ profile, transactions: transactions || [] });
+    // Resolve who the user talked to for each conversation-linked transaction.
+    const txs = transactions || [];
+    const convIds = [...new Set(txs.map((t) => t.conversation_id).filter(Boolean))];
+    const partnerByConv = new Map();
+    if (convIds.length) {
+      const { data: convs } = await supabaseAdmin
+        .from("conversations")
+        .select("id, talker_id, listener_id")
+        .in("id", convIds);
+      const { data: reqs } = await supabaseAdmin
+        .from("talk_requests")
+        .select("conversation_id, sender_id, is_anonymous")
+        .in("conversation_id", convIds);
+      const anonByConv = new Map();
+      for (const r of reqs || []) anonByConv.set(r.conversation_id, r);
+
+      const partnerIds = [];
+      const convPartner = new Map();
+      for (const c of convs || []) {
+        const partnerId = c.talker_id === user.id ? c.listener_id : c.talker_id;
+        convPartner.set(c.id, partnerId);
+        partnerIds.push(partnerId);
+      }
+      const { data: people } = await supabaseAdmin
+        .from("profiles")
+        .select("id, display_name")
+        .in("id", partnerIds.length ? partnerIds : [user.id]);
+      const nameById = new Map((people || []).map((p) => [p.id, p.display_name]));
+
+      for (const c of convs || []) {
+        const partnerId = convPartner.get(c.id);
+        const anonReq = anonByConv.get(c.id);
+        const partnerWasAnonTalker =
+          anonReq && anonReq.is_anonymous && anonReq.sender_id === partnerId;
+        partnerByConv.set(
+          c.id,
+          partnerWasAnonTalker ? "anonymous" : nameById.get(partnerId) || "a stranger"
+        );
+      }
+    }
+
+    const enriched = txs.map((t) => ({
+      id: t.id,
+      amount: t.amount,
+      reason: t.reason,
+      created_at: t.created_at,
+      partner: t.conversation_id ? partnerByConv.get(t.conversation_id) || null : null,
+    }));
+
+    return res.status(200).json({ profile, transactions: enriched });
   }
 
   if (req.method === "PATCH") {

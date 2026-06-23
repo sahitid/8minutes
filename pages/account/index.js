@@ -215,7 +215,10 @@ export default function Account() {
               {transactions.map((t, i) => (
                 <li key={t.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderTop: i === 0 ? "none" : `2px dashed #e3ddd0` }}>
                   <div>
-                    <p style={{ fontSize: 14.5, margin: 0, fontWeight: 700 }}>{reasonLabel(t.reason)}</p>
+                    <p style={{ fontSize: 14.5, margin: 0, fontWeight: 700 }}>
+                      {reasonLabel(t.reason)}
+                      {t.partner ? <span style={{ color: "#5a5a5a", fontWeight: 600 }}> · with {t.partner}</span> : null}
+                    </p>
                     <p style={{ fontSize: 12.5, color: "#5a5a5a", margin: 0 }}>{new Date(t.created_at).toLocaleString()}</p>
                   </div>
                   <span className="marker" style={{ fontSize: 20, fontWeight: 700, color: t.amount > 0 ? "#3a8a4a" : "#E58A8A" }}>{t.amount > 0 ? `+${t.amount}` : t.amount}</span>

@@ -313,11 +313,6 @@ export default function Home() {
             <a href="#how" style={{ textDecoration: "none", color: INK, fontWeight: 800, fontSize: 16, borderBottom: `2.5px dashed ${INK}`, paddingBottom: 2 }}>how it works ↓</a>
           </div>
 
-          <div style={{ display: "flex", gap: 18, alignItems: "center", justifyContent: "center", flexWrap: "wrap", marginTop: 26, fontSize: 14, fontWeight: 700, color: "#5a5a5a" }}>
-            <span style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ width: 7, height: 7, borderRadius: "50%", background: "#9CC79A" }} />free</span>
-            <span style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ width: 7, height: 7, borderRadius: "50%", background: "#E58A8A" }} />anonymous</span>
-            <span style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ width: 7, height: 7, borderRadius: "50%", background: "#E8B873" }} />no app to install</span>
-          </div>
         </div>
 
         <div style={{ position: "relative", zIndex: 2, display: "flex", justifyContent: "center" }}>
@@ -373,7 +368,6 @@ export default function Home() {
               {step.icon}
               <h3 className="marker" style={{ fontWeight: 600, fontSize: 23, margin: "0 0 8px" }}>{step.title}</h3>
               <p style={{ fontSize: 16, lineHeight: 1.5, color: "#3a3a3a", margin: 0 }}>{step.body}</p>
-              <p className="marker step-hint" style={{ fontSize: 15, color: INK, fontWeight: 600 }}>{step.hint}</p>
             </div>
           ))}
         </div>

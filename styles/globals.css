@@ -3,6 +3,11 @@
 @tailwind utilities;
 @import url('https://fonts.googleapis.com/css2?family=Radley:wght@400;700&display=swap');
 
+html, body {
+  background-color: #FBF8F3;
+  overscroll-behavior-y: none;
+}
+
 body {
   font-family: 'Radley', serif;
 }
@@ -93,7 +98,16 @@ html { scroll-behavior: smooth; }
   transition: transform .15s ease, box-shadow .15s ease;
 }
 .doodle-btn:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #1a1a1a; }
+.doodle-btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 #1a1a1a; }
 .doodle-btn:disabled { opacity: .55; cursor: default; transform: none; box-shadow: 5px 5px 0 #1a1a1a; }
+
+/* Consistent 3d press for all sketch buttons across the site. */
+.hard-link { transition: transform .12s ease, box-shadow .12s ease; }
+.hard-link:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #1a1a1a !important; }
+.hard-link:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 #1a1a1a !important; }
+.hard-link-sm { transition: transform .12s ease, box-shadow .12s ease; }
+.hard-link-sm:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 #1a1a1a !important; }
+.hard-link-sm:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 #1a1a1a !important; }
 .doodle-btn-outline { background: #fff; }
 .doodle-btn-green { background: #D6E8D5; }
 .doodle-input {
@@ -118,11 +132,7 @@ html { scroll-behavior: smooth; }
 .eight-landing .hard-link-sm:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 #1a1a1a !important; }
 .eight-landing .switch-btn:hover { background: #FBF8F3 !important; }
 .eight-landing .lift-card { transition: transform .18s ease, box-shadow .18s ease; }
-.eight-landing .lift-card:hover { transform: translate(-3px,-3px) rotate(0deg) !important; box-shadow: 10px 10px 0 #1a1a1a !important; }
-.eight-landing .lift-card .step-icon { transition: transform .2s ease; transform-origin: 50% 50%; }
-.eight-landing .lift-card:hover .step-icon { animation: wiggle .5s ease-in-out; }
-.eight-landing .lift-card .step-hint { max-height: 0; opacity: 0; overflow: hidden; transition: max-height .25s ease, opacity .25s ease, margin .25s ease; margin-top: 0; }
-.eight-landing .lift-card:hover .step-hint { max-height: 40px; opacity: 1; margin-top: 12px; }
+.eight-landing .lift-card:hover { transform: translate(-2px,-2px) !important; box-shadow: 8px 8px 0 #1a1a1a !important; }
 
 @media (max-width: 900px) {
   .eight-landing .hero-grid { grid-template-columns: 1fr !important; text-align: center; }

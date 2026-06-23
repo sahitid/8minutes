@@ -3,7 +3,7 @@ import Head from 'next/head'
 export default function HeadObject({children}) {
     const title = "8 Minutes";
     const description = "It only takes 8 minutes with a friend to feel less alone. We pair strangers together for short, honest conversations. Connect with someone new, share what's on your mind, and feel a little more at home in the world, all in just eight minutes.";
-    const searchBarColor = "#ffffff"; 
+    const searchBarColor = "#FBF8F3"; 
     const keywords = "8 minutes, 8minutes, eight minutes, eight, minutes, free chat, ";
     const author = "Sahiti Dasari";
     const url = "http://localhost:3000";

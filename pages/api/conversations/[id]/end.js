@@ -26,5 +26,8 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: error.message });
   }
 
+  // Conversations are ephemeral: wipe the messages once the session ends.
+  await supabaseAdmin.from("messages").delete().eq("conversation_id", id);
+
   return res.status(200).json({ ok: true });
 }

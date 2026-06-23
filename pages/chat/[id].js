@@ -137,6 +137,23 @@ export default function ChatRoom() {
     if (error) setError("Message failed to send.");
   }
 
+  function exportTranscript() {
+    const partner = meta?.partner_display_name || "your match";
+    const lines = messages.map(
+      (m) => `${m.sender_id === user.id ? "me" : partner}: ${m.content}`
+    );
+    const text = `8 Minutes — a conversation with ${partner}\n${new Date().toLocaleString()}\n\n${lines.join("\n")}\n`;
+    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "8minutes-conversation.txt";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
   async function reportConversation() {
     await fetch("/api/reports", {
       method: "POST",
@@ -214,8 +231,12 @@ export default function ChatRoom() {
           {/* composer / end state */}
           {ended ? (
             <div style={{ padding: "20px", borderTop: `3px solid ${INK}`, textAlign: "center", background: "#D6E8D5" }}>
-              <p style={{ fontSize: 14.5, margin: "0 0 12px", fontWeight: 700 }}>your 8 minutes are up. thanks for connecting 💛</p>
-              <Link href="/account" className="doodle-btn">back to account</Link>
+              <p style={{ fontSize: 14.5, margin: "0 0 6px", fontWeight: 700 }}>your 8 minutes are up. thanks for connecting 💛</p>
+              <p style={{ fontSize: 12.5, margin: "0 0 14px", color: "#3a3a3a" }}>this chat is erased when you leave. save it if you&apos;d like to keep it.</p>
+              <div style={{ display: "flex", justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
+                <button onClick={exportTranscript} disabled={messages.length === 0} className="doodle-btn doodle-btn-outline">save transcript</button>
+                <Link href="/account" className="doodle-btn">delete & leave</Link>
+              </div>
             </div>
           ) : (
             <form onSubmit={sendMessage} style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", borderTop: `3px solid ${INK}` }}>
