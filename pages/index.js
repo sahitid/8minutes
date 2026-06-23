@@ -98,7 +98,7 @@ function TinCanDoodle() {
   const [size, setSize] = useState({ w: 0, h: 0, vh: 0 });
   const [topOff, setTopOff] = useState({ x: 0, y: 0 });
   const [botOff, setBotOff] = useState({ x: 0, y: 0 });
-  const [ctrl, setCtrl] = useState(null); // animated sag control point
+  const [ctrls, setCtrls] = useState(null); // animated string control points
 
   // Keep the latest values available to the animation loop without re-binding.
   const stateRef = useRef({ size, topOff, botOff });
@@ -144,46 +144,40 @@ function TinCanDoodle() {
     };
   }
 
-  // Spring + gravity simulation for the string's sagging midpoint.
+  // Fluid string: it drops from the top cup, pools along a "floor" line just
+  // above the footer, then runs to the bottom cup. The two control points ease
+  // toward gently swaying targets so the rope flows continuously and trails
+  // softly when a cup is dragged.
   useEffect(() => {
     let raf;
-    const pos = { x: 0, y: 0 };
-    const vel = { x: 0, y: 0 };
+    const c1 = { x: 0, y: 0 };
+    const c2 = { x: 0, y: 0 };
     let primed = false;
-    let ctrlSet = false;
 
-    const tick = () => {
+    const tick = (now) => {
       const { size: s } = stateRef.current;
       if (s.h > 0) {
         const { p0, p1 } = endpoints();
-        const midX = (p0.x + p1.x) / 2;
-        const midY = (p0.y + p1.y) / 2;
-        const dist = Math.hypot(p1.x - p0.x, p1.y - p0.y);
-        const sag = Math.min(420, Math.max(60, dist * 0.28)); // gravity droop
-        const restX = midX;
-        const restY = midY + sag;
+        const floorY = s.h - FOOTER_APPROX - 50; // resting line, above the footer
+        const t = now / 1000;
+        const bob = Math.sin(t * 0.9) * 7;
+        // c1 pulls the rope straight down from the top cup to the floor;
+        // c2 lays it along the floor toward the bottom cup.
+        const target1 = { x: p0.x + Math.sin(t * 1.1) * 16, y: floorY + bob };
+        const target2 = { x: p1.x + Math.sin(t * 1.5 + 1) * 20, y: floorY - bob };
 
         if (!primed) {
-          pos.x = restX;
-          pos.y = restY;
+          c1.x = target1.x; c1.y = target1.y;
+          c2.x = target2.x; c2.y = target2.y;
           primed = true;
         }
+        const ease = 0.12; // trailing softness
+        c1.x += (target1.x - c1.x) * ease;
+        c1.y += (target1.y - c1.y) * ease;
+        c2.x += (target2.x - c2.x) * ease;
+        c2.y += (target2.y - c2.y) * ease;
 
-        const k = 0.06; // springiness
-        const damping = 0.82; // how quickly the swing settles
-        vel.x = (vel.x + (restX - pos.x) * k) * damping;
-        vel.y = (vel.y + (restY - pos.y) * k) * damping;
-        pos.x += vel.x;
-        pos.y += vel.y;
-
-        // Only re-render while it's actually moving; idle when settled.
-        const moving =
-          Math.abs(vel.x) + Math.abs(vel.y) > 0.2 ||
-          Math.abs(restX - pos.x) + Math.abs(restY - pos.y) > 0.5;
-        if (moving || !ctrlSet) {
-          ctrlSet = true;
-          setCtrl({ x: pos.x, y: pos.y });
-        }
+        setCtrls({ c1: { x: c1.x, y: c1.y }, c2: { x: c2.x, y: c2.y } });
       }
       raf = requestAnimationFrame(tick);
     };
@@ -195,13 +189,9 @@ function TinCanDoodle() {
   const { topLeft, topTop, botLeft, botTop } = basePositions(size);
 
   let stringPath = "";
-  if (ready && ctrl) {
+  if (ready && ctrls) {
     const { p0, p1 } = endpoints();
-    // Quadratic whose curve passes through the animated control point at t=0.5,
-    // giving a smooth catenary that swings with the simulation.
-    const qx = 2 * ctrl.x - (p0.x + p1.x) / 2;
-    const qy = 2 * ctrl.y - (p0.y + p1.y) / 2;
-    stringPath = `M ${p0.x} ${p0.y} Q ${qx} ${qy} ${p1.x} ${p1.y}`;
+    stringPath = `M ${p0.x} ${p0.y} C ${ctrls.c1.x} ${ctrls.c1.y} ${ctrls.c2.x} ${ctrls.c2.y} ${p1.x} ${p1.y}`;
   }
 
   return (
