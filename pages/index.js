@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import HeadObject from "../components/head";
 import Nav from "../components/nav";
@@ -23,9 +23,14 @@ function HeroEightBall() {
   );
 }
 
-/* A draggable paper cup. Grab it and move it around. */
-function DraggableCup({ base, variant, fill, wave }) {
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
+const CUP_W = 76;
+const CUP_H = 84;
+const CUP_X = 22;
+const CUP_MARGIN = 92; // distance of each cup from the top / bottom of the page
+
+/* A draggable paper cup. Position is controlled by the parent so the string
+   can stay attached to it. */
+function DraggableCup({ left, top, offset, onOffset, variant, fill, wave }) {
   const drag = useRef(null);
 
   function onPointerDown(e) {
@@ -35,7 +40,7 @@ function DraggableCup({ base, variant, fill, wave }) {
   }
   function onPointerMove(e) {
     if (!drag.current) return;
-    setOffset({
+    onOffset({
       x: drag.current.ox + (e.clientX - drag.current.sx),
       y: drag.current.oy + (e.clientY - drag.current.sy),
     });
@@ -47,15 +52,16 @@ function DraggableCup({ base, variant, fill, wave }) {
 
   return (
     <div
-      className="tincan-doodle"
       style={{
         position: "absolute",
-        ...base,
-        width: 76,
-        height: 84,
-        zIndex: 4,
+        left,
+        top,
+        width: CUP_W,
+        height: CUP_H,
+        zIndex: 2,
         cursor: "grab",
         touchAction: "none",
+        pointerEvents: "auto",
         transform: `translate(${offset.x}px, ${offset.y}px)`,
       }}
       onPointerDown={onPointerDown}
@@ -83,27 +89,63 @@ function DraggableCup({ base, variant, fill, wave }) {
   );
 }
 
-/* Decorative tin-can phone running down the whole page. The string is static;
-   the two cups can be grabbed and dragged. */
+/* Tin-can phone running down the page. The string is attached to both cups and
+   re-draws (with a loose sag) as you drag either cup. */
 function TinCanDoodle() {
+  const layerRef = useRef(null);
+  const [height, setHeight] = useState(0);
+  const [topOff, setTopOff] = useState({ x: 0, y: 0 });
+  const [botOff, setBotOff] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const el = layerRef.current;
+    if (!el) return;
+    const measure = () => setHeight(el.clientHeight);
+    measure();
+    const t = setTimeout(measure, 400);
+    let ro;
+    if (typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(measure);
+      ro.observe(el);
+    }
+    window.addEventListener("resize", measure);
+    return () => {
+      clearTimeout(t);
+      if (ro) ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, []);
+
+  const ready = height > 0;
+  const topTop = CUP_MARGIN;
+  const botTop = height - CUP_MARGIN - CUP_H;
+
+  // String endpoints: bottom-centre of the top cup -> top-centre of the bottom cup.
+  const p0 = { x: CUP_X + CUP_W / 2 + topOff.x, y: topTop + CUP_H + topOff.y };
+  const p1 = { x: CUP_X + CUP_W / 2 + botOff.x, y: botTop + botOff.y };
+  const dy = p1.y - p0.y;
+  // Loose, hand-drawn sag: control points pull the curve sideways a touch.
+  const c1 = { x: p0.x - 36, y: p0.y + dy * 0.3 };
+  const c2 = { x: p1.x + 36, y: p0.y + dy * 0.7 };
+  const stringPath = `M ${p0.x} ${p0.y} C ${c1.x} ${c1.y}, ${c2.x} ${c2.y}, ${p1.x} ${p1.y}`;
+
   return (
-    <>
-      {/* static wavy string, behind the content */}
-      <div className="tincan-doodle" style={{ position: "absolute", top: 176, bottom: 176, left: 22, width: 76, zIndex: 0, pointerEvents: "none" }} aria-hidden="true">
-        <svg width="76" height="100%" viewBox="0 0 76 1000" preserveAspectRatio="none" fill="none">
-          <path
-            d="M38 0 C10 80 66 150 38 230 C12 300 64 380 38 460 C12 540 66 620 38 700 C12 780 64 860 38 1000"
-            stroke={INK}
-            strokeWidth="3.5"
-            strokeLinecap="round"
-            strokeDasharray="10 10"
-          />
-        </svg>
-      </div>
-      {/* draggable cups, above the content */}
-      <DraggableCup base={{ top: 92, left: 22 }} variant="top" fill="#FCE7C8" wave="#E58A8A" />
-      <DraggableCup base={{ bottom: 92, left: 22 }} variant="bottom" fill="#D6E8D5" wave="#9CC79A" />
-    </>
+    <div
+      ref={layerRef}
+      className="tincan-doodle"
+      style={{ position: "absolute", inset: 0, zIndex: 4, pointerEvents: "none", overflow: "visible" }}
+      aria-hidden="true"
+    >
+      {ready && (
+        <>
+          <svg width="100%" height="100%" style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "visible" }}>
+            <path d={stringPath} stroke={INK} strokeWidth="3.5" fill="none" strokeLinecap="round" strokeDasharray="10 10" />
+          </svg>
+          <DraggableCup left={CUP_X} top={topTop} offset={topOff} onOffset={setTopOff} variant="top" fill="#FCE7C8" wave="#E58A8A" />
+          <DraggableCup left={CUP_X} top={botTop} offset={botOff} onOffset={setBotOff} variant="bottom" fill="#D6E8D5" wave="#9CC79A" />
+        </>
+      )}
+    </div>
   );
 }
 
