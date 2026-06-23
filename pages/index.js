@@ -72,19 +72,18 @@ function DraggableCup({ left, top, offset, onOffset, variant, fill, wave }) {
       aria-hidden="true"
     >
       <svg width="76" height="84" viewBox="0 0 76 84" fill="none" style={{ pointerEvents: "none" }}>
-        {variant === "top" ? (
-          <>
-            <path d="M20 78 L56 78 L50 30 L26 30 Z" fill={fill} stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
-            <ellipse cx="38" cy="30" rx="14" ry="6" fill="#fff" stroke={INK} strokeWidth="4.5" />
-            <path d="M60 40 q9 -5 0 -14 M67 46 q16 -8 0 -22" stroke={wave} strokeWidth="3" fill="none" strokeLinecap="round" />
-          </>
-        ) : (
-          <>
-            <path d="M20 6 L56 6 L50 54 L26 54 Z" fill={fill} stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
-            <ellipse cx="38" cy="54" rx="14" ry="6" fill="#fff" stroke={INK} strokeWidth="4.5" />
-            <path d="M60 44 q9 -5 0 -14 M67 50 q16 -8 0 -22" stroke={wave} strokeWidth="3" fill="none" strokeLinecap="round" />
-          </>
-        )}
+        {/* paper cup: wide rim at the top tapering to a smaller base */}
+        <path d="M15 22 L61 22 L54 71 L22 71 Z" fill={fill} stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
+        {/* base */}
+        <path d="M22 71 Q38 77 54 71" fill="none" stroke={INK} strokeWidth="4.5" strokeLinecap="round" />
+        {/* paper ridges */}
+        <path d="M19 40 L57 40" stroke={INK} strokeWidth="2" opacity="0.18" />
+        <path d="M21 55 L55 55" stroke={INK} strokeWidth="2" opacity="0.18" />
+        {/* rim opening */}
+        <ellipse cx="38" cy="22" rx="23" ry="7.5" fill="#fff" stroke={INK} strokeWidth="4.5" />
+        <ellipse cx="38" cy="22" rx="14" ry="4" fill={fill} opacity="0.5" />
+        {/* little sound waves coming out of the cup */}
+        <path d="M64 14 q11 8 0 18 M70 9 q17 13 0 28" stroke={wave} strokeWidth="3" fill="none" strokeLinecap="round" />
       </svg>
     </div>
   );
@@ -139,8 +138,9 @@ function TinCanDoodle() {
     const { size: s, topOff: to, botOff: bo } = stateRef.current;
     const b = basePositions(s);
     return {
-      p0: { x: b.topLeft + CUP_W / 2 + to.x, y: b.topTop + CUP_H + to.y },
-      p1: { x: b.botLeft + CUP_W / 2 + bo.x, y: b.botTop + bo.y },
+      // string leaves the base of the top cup, arrives at the rim of the bottom cup
+      p0: { x: b.topLeft + CUP_W / 2 + to.x, y: b.topTop + 71 + to.y },
+      p1: { x: b.botLeft + CUP_W / 2 + bo.x, y: b.botTop + 22 + bo.y },
     };
   }
 
