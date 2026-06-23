@@ -25,8 +25,9 @@ function HeroEightBall() {
 
 const CUP_W = 76;
 const CUP_H = 84;
-const CUP_X = 22;
-const CUP_MARGIN = 92; // distance of each cup from the top / bottom of the page
+const CUP_X = 28; // horizontal inset from the edges
+const TOP_FACTOR = 0.42; // top cup sits ~midway down the first screen
+const FOOTER_APPROX = 96; // bottom cup rests just above the footer break
 
 /* A draggable paper cup. Position is controlled by the parent so the string
    can stay attached to it. */
@@ -89,18 +90,25 @@ function DraggableCup({ left, top, offset, onOffset, variant, fill, wave }) {
   );
 }
 
-/* Tin-can phone running down the page. The string is attached to both cups and
-   re-draws (with a loose sag) as you drag either cup. */
+/* Tin-can phone: top cup at top-left, bottom cup at bottom-right. The string
+   is a little gravity simulation: its midpoint hangs and swings (spring +
+   damping) and settles, so dragging a cup makes it flow like a real string. */
 function TinCanDoodle() {
   const layerRef = useRef(null);
-  const [height, setHeight] = useState(0);
+  const [size, setSize] = useState({ w: 0, h: 0, vh: 0 });
   const [topOff, setTopOff] = useState({ x: 0, y: 0 });
   const [botOff, setBotOff] = useState({ x: 0, y: 0 });
+  const [ctrl, setCtrl] = useState(null); // animated sag control point
+
+  // Keep the latest values available to the animation loop without re-binding.
+  const stateRef = useRef({ size, topOff, botOff });
+  stateRef.current = { size, topOff, botOff };
 
   useEffect(() => {
     const el = layerRef.current;
     if (!el) return;
-    const measure = () => setHeight(el.clientHeight);
+    const measure = () =>
+      setSize({ w: el.clientWidth, h: el.clientHeight, vh: window.innerHeight });
     measure();
     const t = setTimeout(measure, 400);
     let ro;
@@ -116,18 +124,85 @@ function TinCanDoodle() {
     };
   }, []);
 
-  const ready = height > 0;
-  const topTop = CUP_MARGIN;
-  const botTop = height - CUP_MARGIN - CUP_H;
+  // Base (un-dragged) cup positions for a given measured size.
+  function basePositions(s) {
+    return {
+      topLeft: s.w - CUP_W - CUP_X, // top cup: top-right
+      topTop: Math.round((s.vh || 800) * TOP_FACTOR), // ~midway down the screen
+      botLeft: CUP_X, // bottom cup: bottom-left
+      botTop: s.h - FOOTER_APPROX - CUP_H, // resting on the footer break
+    };
+  }
 
-  // String endpoints: bottom-centre of the top cup -> top-centre of the bottom cup.
-  const p0 = { x: CUP_X + CUP_W / 2 + topOff.x, y: topTop + CUP_H + topOff.y };
-  const p1 = { x: CUP_X + CUP_W / 2 + botOff.x, y: botTop + botOff.y };
-  const dy = p1.y - p0.y;
-  // Loose, hand-drawn sag: control points pull the curve sideways a touch.
-  const c1 = { x: p0.x - 36, y: p0.y + dy * 0.3 };
-  const c2 = { x: p1.x + 36, y: p0.y + dy * 0.7 };
-  const stringPath = `M ${p0.x} ${p0.y} C ${c1.x} ${c1.y}, ${c2.x} ${c2.y}, ${p1.x} ${p1.y}`;
+  // String endpoints from current state.
+  function endpoints() {
+    const { size: s, topOff: to, botOff: bo } = stateRef.current;
+    const b = basePositions(s);
+    return {
+      p0: { x: b.topLeft + CUP_W / 2 + to.x, y: b.topTop + CUP_H + to.y },
+      p1: { x: b.botLeft + CUP_W / 2 + bo.x, y: b.botTop + bo.y },
+    };
+  }
+
+  // Spring + gravity simulation for the string's sagging midpoint.
+  useEffect(() => {
+    let raf;
+    const pos = { x: 0, y: 0 };
+    const vel = { x: 0, y: 0 };
+    let primed = false;
+    let ctrlSet = false;
+
+    const tick = () => {
+      const { size: s } = stateRef.current;
+      if (s.h > 0) {
+        const { p0, p1 } = endpoints();
+        const midX = (p0.x + p1.x) / 2;
+        const midY = (p0.y + p1.y) / 2;
+        const dist = Math.hypot(p1.x - p0.x, p1.y - p0.y);
+        const sag = Math.min(420, Math.max(60, dist * 0.28)); // gravity droop
+        const restX = midX;
+        const restY = midY + sag;
+
+        if (!primed) {
+          pos.x = restX;
+          pos.y = restY;
+          primed = true;
+        }
+
+        const k = 0.06; // springiness
+        const damping = 0.82; // how quickly the swing settles
+        vel.x = (vel.x + (restX - pos.x) * k) * damping;
+        vel.y = (vel.y + (restY - pos.y) * k) * damping;
+        pos.x += vel.x;
+        pos.y += vel.y;
+
+        // Only re-render while it's actually moving; idle when settled.
+        const moving =
+          Math.abs(vel.x) + Math.abs(vel.y) > 0.2 ||
+          Math.abs(restX - pos.x) + Math.abs(restY - pos.y) > 0.5;
+        if (moving || !ctrlSet) {
+          ctrlSet = true;
+          setCtrl({ x: pos.x, y: pos.y });
+        }
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  const ready = size.h > 0;
+  const { topLeft, topTop, botLeft, botTop } = basePositions(size);
+
+  let stringPath = "";
+  if (ready && ctrl) {
+    const { p0, p1 } = endpoints();
+    // Quadratic whose curve passes through the animated control point at t=0.5,
+    // giving a smooth catenary that swings with the simulation.
+    const qx = 2 * ctrl.x - (p0.x + p1.x) / 2;
+    const qy = 2 * ctrl.y - (p0.y + p1.y) / 2;
+    stringPath = `M ${p0.x} ${p0.y} Q ${qx} ${qy} ${p1.x} ${p1.y}`;
+  }
 
   return (
     <div
@@ -139,10 +214,12 @@ function TinCanDoodle() {
       {ready && (
         <>
           <svg width="100%" height="100%" style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "visible" }}>
-            <path d={stringPath} stroke={INK} strokeWidth="3.5" fill="none" strokeLinecap="round" strokeDasharray="10 10" />
+            {stringPath ? (
+              <path d={stringPath} stroke={INK} strokeWidth="3.5" fill="none" strokeLinecap="round" strokeDasharray="10 10" />
+            ) : null}
           </svg>
-          <DraggableCup left={CUP_X} top={topTop} offset={topOff} onOffset={setTopOff} variant="top" fill="#FCE7C8" wave="#E58A8A" />
-          <DraggableCup left={CUP_X} top={botTop} offset={botOff} onOffset={setBotOff} variant="bottom" fill="#D6E8D5" wave="#9CC79A" />
+          <DraggableCup left={topLeft} top={topTop} offset={topOff} onOffset={setTopOff} variant="top" fill="#FCE7C8" wave="#E58A8A" />
+          <DraggableCup left={botLeft} top={botTop} offset={botOff} onOffset={setBotOff} variant="bottom" fill="#D6E8D5" wave="#9CC79A" />
         </>
       )}
     </div>
