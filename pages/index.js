@@ -160,18 +160,26 @@ function TinCanDoodle() {
         const { p0, p1 } = endpoints();
         const floorY = s.h - FOOTER_APPROX - 50; // resting line, above the footer
         const t = now / 1000;
-        const bob = Math.sin(t * 0.9) * 7;
-        // c1 pulls the rope straight down from the top cup to the floor;
+        // Layered waves give the rope a looser, more fluid undulation.
+        const bob1 = Math.sin(t * 0.9) * 12 + Math.sin(t * 1.9) * 5;
+        const bob2 = Math.sin(t * 0.8 + 1) * 12 + Math.sin(t * 2.2 + 0.5) * 5;
+        // c1 pulls the rope down from the top cup toward the floor;
         // c2 lays it along the floor toward the bottom cup.
-        const target1 = { x: p0.x + Math.sin(t * 1.1) * 16, y: floorY + bob };
-        const target2 = { x: p1.x + Math.sin(t * 1.5 + 1) * 20, y: floorY - bob };
+        const target1 = {
+          x: p0.x + Math.sin(t * 1.1) * 24 + Math.sin(t * 2.4) * 9,
+          y: floorY + bob1,
+        };
+        const target2 = {
+          x: p1.x + Math.sin(t * 1.5 + 1) * 30 + Math.sin(t * 2.8 + 0.6) * 11,
+          y: floorY - bob2,
+        };
 
         if (!primed) {
           c1.x = target1.x; c1.y = target1.y;
           c2.x = target2.x; c2.y = target2.y;
           primed = true;
         }
-        const ease = 0.12; // trailing softness
+        const ease = 0.07; // lower = looser, more trailing/fluid
         c1.x += (target1.x - c1.x) * ease;
         c1.y += (target1.y - c1.y) * ease;
         c2.x += (target2.x - c2.x) * ease;
@@ -278,13 +286,13 @@ export default function Home() {
             a tiny window for a real talk
           </div>
 
-          <h1 className="marker" style={{ fontWeight: 700, fontSize: "clamp(46px,6.4vw,82px)", lineHeight: 0.98, margin: "20px 0 6px", letterSpacing: "-0.5px" }}>
+          <h1 className="marker" style={{ fontWeight: 700, fontSize: "clamp(46px,6.4vw,82px)", lineHeight: 1.08, margin: "20px 0 6px", letterSpacing: "-0.5px" }}>
             just{" "}
-            <span style={{ position: "relative", whiteSpace: "nowrap" }}>
+            <span style={{ position: "relative", whiteSpace: "nowrap", display: "inline-block" }}>
               8 minutes
-              <svg viewBox="0 0 240 24" fill="none" preserveAspectRatio="none" style={{ position: "absolute", left: "-1%", bottom: -14, width: "102%", height: 18, overflow: "visible" }}>
-                <path d="M6 13 C74 5 168 5 234 11" stroke="#E58A8A" strokeWidth="5.5" strokeLinecap="round" strokeDasharray="280" strokeDashoffset="280" style={{ animation: "drawIn 1.1s ease-out .35s forwards" }} />
-                <path d="M12 19 C82 14 158 14 228 18" stroke="#E58A8A" strokeWidth="3" strokeLinecap="round" opacity="0.55" strokeDasharray="280" strokeDashoffset="280" style={{ animation: "drawIn 1.1s ease-out .5s forwards" }} />
+              <svg viewBox="0 0 240 24" fill="none" preserveAspectRatio="none" style={{ position: "absolute", left: "-1%", bottom: "-0.12em", width: "102%", height: "0.28em", overflow: "visible" }}>
+                <path d="M6 13 C74 6 168 6 234 11" stroke="#E58A8A" strokeWidth="5" strokeLinecap="round" strokeDasharray="280" strokeDashoffset="280" style={{ animation: "drawIn 1.1s ease-out .35s forwards" }} />
+                <path d="M12 18 C82 14 158 14 228 17" stroke="#E58A8A" strokeWidth="2.6" strokeLinecap="round" opacity="0.5" strokeDasharray="280" strokeDashoffset="280" style={{ animation: "drawIn 1.1s ease-out .5s forwards" }} />
               </svg>
             </span>
             <br />
