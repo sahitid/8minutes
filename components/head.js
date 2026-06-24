@@ -22,7 +22,7 @@ export default function HeadObject({children}) {
             <meta name="keywords" content={keywords} />
             <meta name="author" content={author} />
             <meta name="theme-color" content={searchBarColor} media="(prefers-color-scheme: light)" />
-            <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❽</text></svg>" />
+            <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2246%22 fill=%22%231a1a1a%22/><ellipse cx=%2234%22 cy=%2233%22 rx=%2211%22 ry=%227%22 fill=%22%23ffffff%22 opacity=%220.3%22 transform=%22rotate(-25 34 33)%22/><circle cx=%2250%22 cy=%2255%22 r=%2222%22 fill=%22%23ffffff%22/><text x=%2250%22 y=%2257%22 text-anchor=%22middle%22 dominant-baseline=%22central%22 font-family=%22Arial,Helvetica,sans-serif%22 font-weight=%22700%22 font-size=%2230%22 fill=%22%231a1a1a%22>8</text></svg>" />
             {/* <meta name="theme-color" content={darkSearchBarColor} media="(prefers-color-scheme: dark)" /> */}
 
             {/* OpenGraph */}

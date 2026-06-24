@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/router";
 import Nav from "../../components/nav";
 import HeadObject from "../../components/head";
@@ -6,12 +6,19 @@ import { useSupabase } from "../../lib/supabase/context";
 
 const INK = "#1a1a1a";
 
+// When no human listener takes the envelope, gently fall back to the AI:
+// quickly if nobody's online, or after a hard wait even if listeners are idle.
+const FALLBACK_NO_LISTENERS_MS = 30000;
+const FALLBACK_HARD_MS = 75000;
+
 export default function Waiting() {
   const router = useRouter();
   const { user, loading } = useSupabase();
   const [listeners, setListeners] = useState(null);
   const [status, setStatus] = useState("pending");
   const [noEnvelope, setNoEnvelope] = useState(false);
+  const startedRef = useRef(Date.now());
+  const fallbackRef = useRef(false);
 
   const poll = useCallback(async () => {
     const res = await fetch("/api/requests/mine");
@@ -25,6 +32,29 @@ export default function Waiting() {
     setStatus(data.request.status);
     if (data.request.status === "accepted" && data.request.conversation_id) {
       router.push(`/chat/${data.request.conversation_id}`);
+      return;
+    }
+
+    // No human has opened the envelope yet — fall back to the AI listener.
+    if (data.request.status === "pending" && !fallbackRef.current) {
+      const waited = Date.now() - startedRef.current;
+      const noneOnline = (data.listeners_online || 0) === 0;
+      const shouldFallback =
+        (noneOnline && waited >= FALLBACK_NO_LISTENERS_MS) || waited >= FALLBACK_HARD_MS;
+      if (shouldFallback) {
+        fallbackRef.current = true;
+        try {
+          const fb = await fetch("/api/ai/fallback", { method: "POST" });
+          const fbData = await fb.json().catch(() => ({}));
+          if (fb.ok && fbData.conversation_id) {
+            router.push(`/chat/${fbData.conversation_id}`);
+          } else {
+            fallbackRef.current = false; // allow a retry on the next poll
+          }
+        } catch {
+          fallbackRef.current = false;
+        }
+      }
     }
   }, [router]);
 

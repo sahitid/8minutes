@@ -1,5 +1,6 @@
 import { createServerSupabase } from "../../../../lib/supabase/server";
 import { supabaseAdmin } from "../../../../lib/supabase/admin";
+import { AI_LISTENER_ID, AI_DISCLOSURE, pickDisplayName } from "../../../../lib/ai/listener";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -29,6 +30,20 @@ export default async function handler(req, res) {
 
   const role = conv.talker_id === user.id ? "talker" : "listener";
   const partnerId = role === "talker" ? conv.listener_id : conv.talker_id;
+
+  // The AI fallback listener: give it a per-conversation human name and a flag
+  // the talker's client uses to drive replies (never shown to the user).
+  const partnerIsAi = Boolean(AI_LISTENER_ID) && partnerId === AI_LISTENER_ID;
+  if (partnerIsAi) {
+    return res.status(200).json({
+      conversation: conv,
+      role,
+      partner_display_name: pickDisplayName(conv.id),
+      partner_is_ai: true,
+      ai_disclosed: AI_DISCLOSURE,
+    });
+  }
+
   const { data: partner } = await supabaseAdmin
     .from("profiles")
     .select("display_name")
@@ -39,5 +54,6 @@ export default async function handler(req, res) {
     conversation: conv,
     role,
     partner_display_name: partner?.display_name || "your match",
+    partner_is_ai: false,
   });
 }

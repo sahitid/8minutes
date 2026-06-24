@@ -34,6 +34,7 @@ export default function ChatRoom() {
   const [remaining, setRemaining] = useState(null);
   const [ended, setEnded] = useState(false);
   const [reported, setReported] = useState(false);
+  const [aiTyping, setAiTyping] = useState(false);
   const [warning, setWarning] = useState("");
   const [strikes, setStrikes] = useState(0);
   const [error, setError] = useState("");
@@ -96,6 +97,7 @@ export default function ChatRoom() {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "messages", filter: `conversation_id=eq.${id}` },
         (payload) => {
+          if (payload.new.sender_id !== user.id) setAiTyping(false);
           setMessages((prev) => {
             if (prev.some((m) => m.id === payload.new.id)) return prev;
             return [...prev, payload.new];
@@ -125,7 +127,7 @@ export default function ChatRoom() {
 
   useEffect(() => {
     scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight);
-  }, [messages]);
+  }, [messages, aiTyping]);
 
   async function sendMessage(e) {
     e.preventDefault();
@@ -154,7 +156,26 @@ export default function ChatRoom() {
       sender_id: user.id,
       content,
     });
-    if (error) setError("Message failed to send.");
+    if (error) {
+      setError("Message failed to send.");
+      return;
+    }
+
+    // If this conversation is with the AI listener, nudge it to reply.
+    if (meta?.partner_is_ai) {
+      setAiTyping(true);
+      try {
+        const res = await fetch("/api/ai/respond", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ conversation_id: id }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!data.ok) setAiTyping(false); // realtime turns it off when a reply lands
+      } catch {
+        setAiTyping(false);
+      }
+    }
   }
 
   function exportTranscript() {
@@ -203,7 +224,12 @@ export default function ChatRoom() {
           {/* header */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", borderBottom: `3px solid ${INK}`, background: "#FCE7C8" }}>
             <div>
-              <p className="marker" style={{ fontWeight: 700, fontSize: 18, margin: 0 }}>{meta ? meta.partner_display_name : "connecting..."}</p>
+              <p className="marker" style={{ fontWeight: 700, fontSize: 18, margin: 0, display: "flex", alignItems: "center", gap: 7 }}>
+                {meta ? meta.partner_display_name : "connecting..."}
+                {meta?.ai_disclosed ? (
+                  <span style={{ fontFamily: "'Nunito',sans-serif", fontSize: 10.5, fontWeight: 800, color: "#5a5a5a", border: `2px solid ${INK}`, borderRadius: 20, padding: "1px 7px" }}>AI companion</span>
+                ) : null}
+              </p>
               <p style={{ fontSize: 12, color: "#5a5a5a", margin: 0, fontWeight: 700 }}>{meta ? `you are the ${meta.role}` : ""}</p>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -255,6 +281,15 @@ export default function ChatRoom() {
                 </div>
               );
             })}
+            {aiTyping ? (
+              <div style={{ display: "flex", justifyContent: "flex-start" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "11px 15px", border: `2.5px solid ${INK}`, background: "#fff", borderRadius: "16px 16px 16px 4px", boxShadow: `2px 2px 0 ${INK}` }}>
+                  {[0, 1, 2].map((n) => (
+                    <span key={n} style={{ width: 7, height: 7, borderRadius: "50%", background: INK, animation: `popPulse 1.2s ease-in-out infinite ${n * 0.2}s` }} />
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </div>
 
           {/* composer / end state */}
