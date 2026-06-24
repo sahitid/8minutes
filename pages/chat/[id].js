@@ -4,6 +4,7 @@ import Link from "next/link";
 import Nav from "../../components/nav";
 import HeadObject from "../../components/head";
 import { useSupabase } from "../../lib/supabase/context";
+import { checkMessage, STRIKE_LIMIT } from "../../lib/moderation";
 
 const INK = "#1a1a1a";
 
@@ -33,6 +34,8 @@ export default function ChatRoom() {
   const [remaining, setRemaining] = useState(null);
   const [ended, setEnded] = useState(false);
   const [reported, setReported] = useState(false);
+  const [warning, setWarning] = useState("");
+  const [strikes, setStrikes] = useState(0);
   const [error, setError] = useState("");
   const [rulesAccepted, setRulesAccepted] = useState(false);
   const scrollRef = useRef(null);
@@ -75,7 +78,7 @@ export default function ChatRoom() {
 
       const { data: existing } = await supabase
         .from("messages")
-        .select("id, sender_id, content, created_at")
+        .select("id, sender_id, content, created_at, flagged")
         .eq("conversation_id", id)
         .order("created_at", { ascending: true });
       if (active) setMessages(existing || []);
@@ -128,6 +131,23 @@ export default function ChatRoom() {
     e.preventDefault();
     const content = draft.trim();
     if (!content || ended) return;
+
+    // Guardrails: block rule-breaking content before it ever sends.
+    const verdict = checkMessage(content);
+    if (!verdict.ok) {
+      setWarning(verdict.message);
+      if (verdict.severity === "severe") {
+        const next = strikes + 1;
+        setStrikes(next);
+        if (next >= STRIKE_LIMIT) {
+          setWarning("we've ended this chat to keep everyone safe. please be kind next time 💛");
+          await endConversation();
+        }
+      }
+      return;
+    }
+
+    setWarning("");
     setDraft("");
     const { error } = await supabase.from("messages").insert({
       conversation_id: id,
@@ -155,12 +175,18 @@ export default function ChatRoom() {
   }
 
   async function reportConversation() {
+    if (reported) return;
+    const ok = window.confirm(
+      "Report this conversation? This will immediately and safely end the chat, and our team will review it."
+    );
+    if (!ok) return;
+    setReported(true);
     await fetch("/api/reports", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ conversation_id: id, reason: "user_reported" }),
     });
-    setReported(true);
+    setEnded(true);
   }
 
   if (loading || !user) return null;
@@ -219,10 +245,13 @@ export default function ChatRoom() {
             {messages.map((m) => {
               const mine = m.sender_id === user.id;
               return (
-                <div key={m.id} style={{ display: "flex", justifyContent: mine ? "flex-end" : "flex-start" }}>
-                  <div style={{ maxWidth: "75%", padding: "9px 15px", fontSize: 14.5, fontWeight: 600, border: `2.5px solid ${INK}`, background: mine ? "#FBD5D5" : "#fff", borderRadius: mine ? "16px 16px 4px 16px" : "16px 16px 16px 4px", boxShadow: `2px 2px 0 ${INK}` }}>
+                <div key={m.id} style={{ display: "flex", flexDirection: "column", alignItems: mine ? "flex-end" : "flex-start" }}>
+                  <div style={{ maxWidth: "75%", padding: "9px 15px", fontSize: 14.5, fontWeight: 600, border: `2.5px solid ${m.flagged ? "#c0392b" : INK}`, background: m.flagged ? "#FBD5D5" : mine ? "#FBD5D5" : "#fff", borderRadius: mine ? "16px 16px 4px 16px" : "16px 16px 16px 4px", boxShadow: `2px 2px 0 ${m.flagged ? "#c0392b" : INK}` }}>
                     {m.content}
                   </div>
+                  {m.flagged ? (
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "#c0392b", marginTop: 3 }}>⚠ flagged for review</span>
+                  ) : null}
                 </div>
               );
             })}
@@ -230,19 +259,37 @@ export default function ChatRoom() {
 
           {/* composer / end state */}
           {ended ? (
-            <div style={{ padding: "20px", borderTop: `3px solid ${INK}`, textAlign: "center", background: "#D6E8D5" }}>
-              <p style={{ fontSize: 14.5, margin: "0 0 6px", fontWeight: 700 }}>your 8 minutes are up. thanks for connecting 💛</p>
-              <p style={{ fontSize: 12.5, margin: "0 0 14px", color: "#3a3a3a" }}>this chat is erased when you leave. save it if you&apos;d like to keep it.</p>
+            <div style={{ padding: "20px", borderTop: `3px solid ${INK}`, textAlign: "center", background: reported ? "#FBD5D5" : "#D6E8D5" }}>
+              {reported ? (
+                <>
+                  <p style={{ fontSize: 14.5, margin: "0 0 6px", fontWeight: 700 }}>thanks for flagging this 🙏</p>
+                  <p style={{ fontSize: 12.5, margin: "0 0 14px", color: "#3a3a3a" }}>we&apos;ve ended the chat to keep you safe, and our team will review it.</p>
+                </>
+              ) : (
+                <>
+                  <p style={{ fontSize: 14.5, margin: "0 0 6px", fontWeight: 700 }}>your 8 minutes are up. thanks for connecting 💛</p>
+                  <p style={{ fontSize: 12.5, margin: "0 0 14px", color: "#3a3a3a" }}>this chat is erased when you leave. save it if you&apos;d like to keep it.</p>
+                </>
+              )}
               <div style={{ display: "flex", justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
-                <button onClick={exportTranscript} disabled={messages.length === 0} className="doodle-btn doodle-btn-outline">save transcript</button>
-                <Link href="/account" className="doodle-btn">delete & leave</Link>
+                {!reported ? (
+                  <button onClick={exportTranscript} disabled={messages.length === 0} className="doodle-btn doodle-btn-outline">save transcript</button>
+                ) : null}
+                <Link href="/account" className="doodle-btn">{reported ? "leave" : "delete & leave"}</Link>
               </div>
             </div>
           ) : (
-            <form onSubmit={sendMessage} style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", borderTop: `3px solid ${INK}` }}>
-              <input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="type a message..." className="doodle-input" style={{ flex: 1 }} />
-              <button type="submit" className="doodle-btn" style={{ padding: "10px 20px" }}>send</button>
-            </form>
+            <div style={{ borderTop: `3px solid ${INK}` }}>
+              {warning ? (
+                <div style={{ padding: "9px 14px", background: "#FBE3C8", borderBottom: `2px dashed ${INK}`, fontSize: 13, fontWeight: 700, color: "#8a4a1a", textAlign: "center" }}>
+                  {warning}{strikes > 0 ? ` (${strikes}/${STRIKE_LIMIT})` : ""}
+                </div>
+              ) : null}
+              <form onSubmit={sendMessage} style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px" }}>
+                <input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="type a message..." className="doodle-input" style={{ flex: 1 }} />
+                <button type="submit" className="doodle-btn" style={{ padding: "10px 20px" }}>send</button>
+              </form>
+            </div>
           )}
           </>
           )}

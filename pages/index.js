@@ -23,6 +23,55 @@ function HeroEightBall() {
   );
 }
 
+// Doodle speech bubbles that pop up on either side of the hero 8-ball.
+// Desktop-only (hidden under 900px via the .hero-bubbles CSS rule).
+const HERO_BUBBLES = [
+  { side: "left", pos: { top: 4 }, bg: "#FBD5D5", text: "hey, you there?", delay: 0.35 },
+  { side: "right", pos: { top: 70 }, bg: "#D6E8D5", text: "i'm here 🌷", delay: 0.6 },
+  { side: "left", pos: { bottom: 44 }, bg: "#FCE7C8", text: "kind of a rough day…", delay: 0.85 },
+  { side: "right", pos: { bottom: 2 }, bg: "#fff", text: "you're not alone 🖤", delay: 1.1 },
+];
+
+function HeroChatBubbles() {
+  return (
+    <div className="hero-bubbles" aria-hidden="true" style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 3 }}>
+      {HERO_BUBBLES.map((b, i) => {
+        const isLeft = b.side === "left";
+        return (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              ...(isLeft ? { left: -10 } : { right: -10 }),
+              ...b.pos,
+              transform: `rotate(${isLeft ? -2 : 2}deg)`,
+            }}
+          >
+            <div
+              className="marker"
+              style={{
+                background: b.bg,
+                border: `2.5px solid ${INK}`,
+                borderRadius: isLeft ? "18px 18px 18px 5px" : "18px 18px 5px 18px",
+                padding: "8px 14px",
+                fontSize: 14.5,
+                fontWeight: 700,
+                color: INK,
+                whiteSpace: "nowrap",
+                boxShadow: `3px 3px 0 ${INK}`,
+                transformOrigin: isLeft ? "bottom left" : "bottom right",
+                animation: `bubblePop .55s cubic-bezier(.22,1.2,.36,1) both ${b.delay}s, bubbleFloat 4.2s ease-in-out infinite ${b.delay + 0.8}s`,
+              }}
+            >
+              {b.text}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 const CUP_W = 76;
 const CUP_H = 84;
 const CUP_X = 28; // horizontal inset from the edges
@@ -71,18 +120,22 @@ function DraggableCup({ left, top, offset, onOffset, variant, fill, wave }) {
       onPointerCancel={onPointerUp}
       aria-hidden="true"
     >
-      <svg width="76" height="84" viewBox="0 0 76 84" fill="none" style={{ pointerEvents: "none" }}>
-        {/* paper cup: wide rim at the top tapering to a smaller base */}
-        <path d="M15 22 L61 22 L54 71 L22 71 Z" fill={fill} stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
-        {/* base */}
-        <path d="M22 71 Q38 77 54 71" fill="none" stroke={INK} strokeWidth="4.5" strokeLinecap="round" />
-        {/* paper ridges */}
-        <path d="M19 40 L57 40" stroke={INK} strokeWidth="2" opacity="0.18" />
-        <path d="M21 55 L55 55" stroke={INK} strokeWidth="2" opacity="0.18" />
-        {/* rim opening */}
-        <ellipse cx="38" cy="22" rx="23" ry="7.5" fill="#fff" stroke={INK} strokeWidth="4.5" />
-        <ellipse cx="38" cy="22" rx="14" ry="4" fill={fill} opacity="0.5" />
-        {/* little sound waves coming out of the cup */}
+      <svg width="92" height="84" viewBox="0 0 92 84" fill="none" style={{ pointerEvents: "none", overflow: "visible" }}>
+        {/* tin can: straight cylindrical body with a rounded bottom */}
+        <path d="M18 22 L18 66 Q38 78 58 66 L58 22 Z" fill={fill} stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
+        {/* can ridges */}
+        <path d="M19 37 Q38 42 57 37" fill="none" stroke={INK} strokeWidth="2" opacity="0.22" />
+        <path d="M19 55 Q38 60 57 55" fill="none" stroke={INK} strokeWidth="2" opacity="0.22" />
+        {/* little emblem stamped on the can */}
+        {variant === "top" ? (
+          <path d="M38 52 C30 45 30 39 35 39 C37 39 38 41 38 42 C38 41 39 39 41 39 C46 39 46 45 38 52 Z" fill={wave} stroke={INK} strokeWidth="1.4" strokeLinejoin="round" />
+        ) : (
+          <path transform="translate(29 37.5) scale(0.74)" d="M12 0 C13 8 16 11 24 12 C16 13 13 16 12 24 C11 16 8 13 0 12 C8 11 11 8 12 0Z" fill="#fff" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+        )}
+        {/* open rim */}
+        <ellipse cx="38" cy="22" rx="20" ry="6.5" fill="#fff" stroke={INK} strokeWidth="4.5" />
+        <ellipse cx="38" cy="22" rx="12" ry="3.6" fill={fill} opacity="0.45" />
+        {/* little sound waves coming out of the can */}
         <path d="M64 14 q11 8 0 18 M70 9 q17 13 0 28" stroke={wave} strokeWidth="3" fill="none" strokeLinecap="round" />
       </svg>
     </div>
@@ -199,7 +252,27 @@ function TinCanDoodle() {
   let stringPath = "";
   if (ready && ctrls) {
     const { p0, p1 } = endpoints();
-    stringPath = `M ${p0.x} ${p0.y} C ${ctrls.c1.x} ${ctrls.c1.y} ${ctrls.c2.x} ${ctrls.c2.y} ${p1.x} ${p1.y}`;
+    const c1 = ctrls.c1, c2 = ctrls.c2;
+    const time = (typeof performance !== "undefined" ? performance.now() : Date.now()) / 1000;
+    // Sample the base cubic into a smooth polyline, then add a perpendicular
+    // wiggle whose amplitude peaks in the near-cup halves (|sin(2pi t)| is 0 at
+    // the cups, so the rope stays attached, and largest closer to each cup).
+    const N = 40;
+    const pts = [];
+    for (let i = 0; i <= N; i++) {
+      const t = i / N;
+      const mt = 1 - t;
+      const bx = mt * mt * mt * p0.x + 3 * mt * mt * t * c1.x + 3 * mt * t * t * c2.x + t * t * t * p1.x;
+      const by = mt * mt * mt * p0.y + 3 * mt * mt * t * c1.y + 3 * mt * t * t * c2.y + t * t * t * p1.y;
+      const dx = 3 * mt * mt * (c1.x - p0.x) + 6 * mt * t * (c2.x - c1.x) + 3 * t * t * (p1.x - c2.x);
+      const dy = 3 * mt * mt * (c1.y - p0.y) + 6 * mt * t * (c2.y - c1.y) + 3 * t * t * (p1.y - c2.y);
+      const len = Math.hypot(dx, dy) || 1;
+      const nx = -dy / len, ny = dx / len;
+      const env = Math.abs(Math.sin(Math.PI * 2 * t)); // 0 at cups, peaks near them
+      const off = env * (16 * Math.sin(t * Math.PI * 6 + time * 3.4) + 6 * Math.sin(t * Math.PI * 11 - time * 2.1));
+      pts.push([bx + nx * off, by + ny * off]);
+    }
+    stringPath = "M " + pts.map((p) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(" L ");
   }
 
   return (
@@ -317,6 +390,7 @@ export default function Home() {
           <div style={{ width: "min(300px, 72vw)", aspectRatio: "1", display: "grid", placeItems: "center", animation: "floatY 6s ease-in-out infinite" }}>
             <HeroEightBall />
           </div>
+          <HeroChatBubbles />
         </div>
       </header>
 

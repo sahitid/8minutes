@@ -49,6 +49,12 @@ html { scroll-behavior: smooth; }
 @keyframes nudge { 0%,100%{ transform: translateX(0); } 50%{ transform: translateX(5px); } }
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @keyframes wiggle { 0%,100%{ transform: rotate(-5deg); } 50%{ transform: rotate(5deg); } }
+@keyframes bubblePop { 0%{ opacity: 0; transform: scale(.4) translateY(10px); } 70%{ opacity: 1; transform: scale(1.06) translateY(-2px); } 100%{ opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes bubbleFloat { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-7px); } }
+
+/* Hero chat bubbles are a desktop-only flourish. */
+.hero-bubbles { display: block; }
+@media (max-width: 900px) { .hero-bubbles { display: none !important; } }
 
 /* ===== Shared doodle theme (all screens) ===== */
 .doodle-page {
