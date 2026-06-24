@@ -126,12 +126,8 @@ function DraggableCup({ left, top, offset, onOffset, variant, fill, wave }) {
         {/* can ridges */}
         <path d="M19 37 Q38 42 57 37" fill="none" stroke={INK} strokeWidth="2" opacity="0.22" />
         <path d="M19 55 Q38 60 57 55" fill="none" stroke={INK} strokeWidth="2" opacity="0.22" />
-        {/* little emblem stamped on the can */}
-        {variant === "top" ? (
-          <path d="M38 52 C30 45 30 39 35 39 C37 39 38 41 38 42 C38 41 39 39 41 39 C46 39 46 45 38 52 Z" fill={wave} stroke={INK} strokeWidth="1.4" strokeLinejoin="round" />
-        ) : (
-          <path transform="translate(29 37.5) scale(0.74)" d="M12 0 C13 8 16 11 24 12 C16 13 13 16 12 24 C11 16 8 13 0 12 C8 11 11 8 12 0Z" fill="#fff" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
-        )}
+        {/* little sparkle stamped on the can (same on both cans) */}
+        <path transform="translate(29 37.5) scale(0.74)" d="M12 0 C13 8 16 11 24 12 C16 13 13 16 12 24 C11 16 8 13 0 12 C8 11 11 8 12 0Z" fill="#fff" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
         {/* open rim */}
         <ellipse cx="38" cy="22" rx="20" ry="6.5" fill="#fff" stroke={INK} strokeWidth="4.5" />
         <ellipse cx="38" cy="22" rx="12" ry="3.6" fill={fill} opacity="0.45" />
@@ -155,6 +151,10 @@ function TinCanDoodle() {
   // Keep the latest values available to the animation loop without re-binding.
   const stateRef = useRef({ size, topOff, botOff });
   stateRef.current = { size, topOff, botOff };
+
+  // Movement energy drives the wiggle: it only stirs when a cup is dragged.
+  const energyRef = useRef(0);
+  const prevOffRef = useRef({ to: { x: 0, y: 0 }, bo: { x: 0, y: 0 } });
 
   useEffect(() => {
     const el = layerRef.current;
@@ -208,22 +208,33 @@ function TinCanDoodle() {
     let primed = false;
 
     const tick = (now) => {
-      const { size: s } = stateRef.current;
+      const { size: s, topOff: to, botOff: bo } = stateRef.current;
       if (s.h > 0) {
         const { p0, p1 } = endpoints();
         const floorY = s.h - FOOTER_APPROX - 50; // resting line, above the footer
         const t = now / 1000;
-        // Layered waves give the rope a looser, more fluid undulation.
-        const bob1 = Math.sin(t * 0.9) * 12 + Math.sin(t * 1.9) * 5;
-        const bob2 = Math.sin(t * 0.8 + 1) * 12 + Math.sin(t * 2.2 + 0.5) * 5;
-        // c1 pulls the rope down from the top cup toward the floor;
-        // c2 lays it along the floor toward the bottom cup.
+
+        // Movement energy: bumps while a cup is being dragged and decays back to
+        // zero when idle, so the rope only wiggles in response to movement.
+        const pv = prevOffRef.current;
+        const dmove =
+          Math.hypot(to.x - pv.to.x, to.y - pv.to.y) +
+          Math.hypot(bo.x - pv.bo.x, bo.y - pv.bo.y);
+        pv.to = { x: to.x, y: to.y };
+        pv.bo = { x: bo.x, y: bo.y };
+        energyRef.current = energyRef.current * 0.9 + dmove;
+        const e = Math.min(1, energyRef.current / 36);
+
+        // At rest the rope hangs straight down to the floor; the sway only
+        // grows with movement energy.
+        const bob1 = (Math.sin(t * 0.9) * 12 + Math.sin(t * 1.9) * 5) * e;
+        const bob2 = (Math.sin(t * 0.8 + 1) * 12 + Math.sin(t * 2.2 + 0.5) * 5) * e;
         const target1 = {
-          x: p0.x + Math.sin(t * 1.1) * 24 + Math.sin(t * 2.4) * 9,
+          x: p0.x + (Math.sin(t * 1.1) * 24 + Math.sin(t * 2.4) * 9) * e,
           y: floorY + bob1,
         };
         const target2 = {
-          x: p1.x + Math.sin(t * 1.5 + 1) * 30 + Math.sin(t * 2.8 + 0.6) * 11,
+          x: p1.x + (Math.sin(t * 1.5 + 1) * 30 + Math.sin(t * 2.8 + 0.6) * 11) * e,
           y: floorY - bob2,
         };
 
@@ -238,7 +249,7 @@ function TinCanDoodle() {
         c2.x += (target2.x - c2.x) * ease;
         c2.y += (target2.y - c2.y) * ease;
 
-        setCtrls({ c1: { x: c1.x, y: c1.y }, c2: { x: c2.x, y: c2.y } });
+        setCtrls({ c1: { x: c1.x, y: c1.y }, c2: { x: c2.x, y: c2.y }, e });
       }
       raf = requestAnimationFrame(tick);
     };
@@ -253,6 +264,7 @@ function TinCanDoodle() {
   if (ready && ctrls) {
     const { p0, p1 } = endpoints();
     const c1 = ctrls.c1, c2 = ctrls.c2;
+    const e = ctrls.e || 0; // wiggle amplitude follows movement energy
     const time = (typeof performance !== "undefined" ? performance.now() : Date.now()) / 1000;
     // Sample the base cubic into a smooth polyline, then add a perpendicular
     // wiggle whose amplitude peaks in the near-cup halves (|sin(2pi t)| is 0 at
@@ -269,7 +281,7 @@ function TinCanDoodle() {
       const len = Math.hypot(dx, dy) || 1;
       const nx = -dy / len, ny = dx / len;
       const env = Math.abs(Math.sin(Math.PI * 2 * t)); // 0 at cups, peaks near them
-      const off = env * (16 * Math.sin(t * Math.PI * 6 + time * 3.4) + 6 * Math.sin(t * Math.PI * 11 - time * 2.1));
+      const off = e * env * (14 * Math.sin(t * Math.PI * 6 + time * 3.4) + 5 * Math.sin(t * Math.PI * 11 - time * 2.1));
       pts.push([bx + nx * off, by + ny * off]);
     }
     stringPath = "M " + pts.map((p) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(" L ");
@@ -530,7 +542,10 @@ export default function Home() {
             <a href="#volunteer" style={{ color: INK, textDecoration: "none" }}>volunteer</a>
             <Link href={user ? "/account" : "/login"} style={{ color: INK, textDecoration: "none" }}>{user ? "account" : "sign in"}</Link>
           </div>
-          <span className="marker" style={{ fontSize: 16, color: "#5a5a5a" }}>made with 🖤</span>
+          <span className="marker" style={{ fontSize: 16, color: "#5a5a5a" }}>
+            made with{" "}
+            <a href="https://www.sahiti.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }}>🖤</a>
+          </span>
         </div>
       </footer>
     </div>

@@ -37,7 +37,7 @@ function backdrop() {
     <rect width="1200" height="630" fill="url(#dots)" opacity="0.05"/>
     <path d="M 1012 206 C 1092 282 950 360 1012 440"
           fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>
-    ${cup(936, 58, 2.0, "#FCE7C8", "#E58A8A", "heart")}
+    ${cup(936, 58, 2.0, "#FCE7C8", "#E58A8A", "star")}
     ${cup(936, 396, 2.0, "#D6E8D5", "#9CC79A", "star")}
   </svg>`;
   return `data:image/svg+xml;base64,${btoa(svg)}`;

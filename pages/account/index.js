@@ -230,7 +230,10 @@ export default function Account() {
       </main>
 
       <footer style={{ padding: "30px 0" }}>
-        <p className="marker" style={{ textAlign: "center", fontSize: 16, color: "#5a5a5a" }}>made with 🖤</p>
+        <p className="marker" style={{ textAlign: "center", fontSize: 16, color: "#5a5a5a" }}>
+          made with{" "}
+          <a href="https://www.sahiti.dev/" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }}>🖤</a>
+        </p>
       </footer>
     </div>
   );
