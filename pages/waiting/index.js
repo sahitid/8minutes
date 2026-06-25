@@ -6,10 +6,9 @@ import { useSupabase } from "../../lib/supabase/context";
 
 const INK = "#1a1a1a";
 
-// When no human listener takes the envelope, gently fall back to the AI:
-// quickly if nobody's online, or after a hard wait even if listeners are idle.
+// Only fall back to the AI when literally no human listener is online. As long
+// as people are around, we keep waiting so real humans get paired together.
 const FALLBACK_NO_LISTENERS_MS = 30000;
-const FALLBACK_HARD_MS = 75000;
 
 export default function Waiting() {
   const router = useRouter();
@@ -35,13 +34,12 @@ export default function Waiting() {
       return;
     }
 
-    // No human has opened the envelope yet — fall back to the AI listener.
+    // Fall back to the AI only when nobody's online to take it. If any human is
+    // around, keep waiting so two real people get paired.
     if (data.request.status === "pending" && !fallbackRef.current) {
       const waited = Date.now() - startedRef.current;
       const noneOnline = (data.listeners_online || 0) === 0;
-      const shouldFallback =
-        (noneOnline && waited >= FALLBACK_NO_LISTENERS_MS) || waited >= FALLBACK_HARD_MS;
-      if (shouldFallback) {
+      if (noneOnline && waited >= FALLBACK_NO_LISTENERS_MS) {
         fallbackRef.current = true;
         try {
           const fb = await fetch("/api/ai/fallback", { method: "POST" });

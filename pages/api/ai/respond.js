@@ -104,8 +104,10 @@ export default async function handler(req, res) {
       model: gateway(AI_MODEL),
       system: buildSystemPrompt(survey, minutesLeft, pickDisplayName(conversation_id)),
       messages,
-      temperature: 0.85,
-      maxOutputTokens: 160,
+      temperature: 0.95,
+      frequencyPenalty: 0.4,
+      presencePenalty: 0.4,
+      maxOutputTokens: 90,
     });
     reply = (out.text || "").trim();
   } catch (e) {
