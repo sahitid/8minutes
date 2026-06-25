@@ -11,6 +11,7 @@ import {
   crisisReply,
   humanDelayMs,
   splitIntoBubbles,
+  pickDisplayName,
 } from "../../../lib/ai/listener";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -101,7 +102,7 @@ export default async function handler(req, res) {
   try {
     const out = await generateText({
       model: gateway(AI_MODEL),
-      system: buildSystemPrompt(survey, minutesLeft),
+      system: buildSystemPrompt(survey, minutesLeft, pickDisplayName(conversation_id)),
       messages,
       temperature: 0.85,
       maxOutputTokens: 160,
