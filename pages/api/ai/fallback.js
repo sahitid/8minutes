@@ -1,6 +1,6 @@
 import { createServerSupabase } from "../../../lib/supabase/server";
 import { supabaseAdmin } from "../../../lib/supabase/admin";
-import { AI_LISTENER_ID } from "../../../lib/ai/listener";
+import { AI_LISTENER_ID, casualize } from "../../../lib/ai/listener";
 
 const HEARTBEAT_WINDOW_SECONDS = 90;
 
@@ -89,12 +89,15 @@ export default async function handler(req, res) {
     .update({ conversation_id: conversationId })
     .eq("id", claimed.id);
 
-  // Seed a warm opener so the chat feels alive immediately.
-  await supabaseAdmin.from("messages").insert({
-    conversation_id: conversationId,
-    sender_id: AI_LISTENER_ID,
-    content: pickOpener(conversationId),
-  });
+  // Humans don't always text first. About half the time, seed a warm opener;
+  // otherwise stay quiet and let the talker open the conversation.
+  if (Math.random() < 0.5) {
+    await supabaseAdmin.from("messages").insert({
+      conversation_id: conversationId,
+      sender_id: AI_LISTENER_ID,
+      content: casualize(pickOpener(conversationId)),
+    });
+  }
 
   return res.status(200).json({ conversation_id: conversationId });
 }

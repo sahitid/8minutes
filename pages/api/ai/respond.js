@@ -11,6 +11,8 @@ import {
   crisisReply,
   humanDelayMs,
   splitIntoBubbles,
+  softenQuestions,
+  casualize,
   pickDisplayName,
 } from "../../../lib/ai/listener";
 
@@ -118,13 +120,17 @@ export default async function handler(req, res) {
   // Strip wrapping quotes the model sometimes adds.
   reply = reply.replace(/^["']|["']$/g, "").trim();
 
+  // Don't always volley a question back — sometimes just react.
+  reply = softenQuestions(reply);
+
   // Safety net: never let the AI emit blocked content.
   const verdict = checkMessage(reply);
   if (!reply || (verdict && !verdict.ok && verdict.severity === "severe")) {
     reply = "i'm here with you. tell me more?";
   }
 
-  const bubbles = splitIntoBubbles(reply);
+  const bubbles = splitIntoBubbles(reply).map(casualize).filter((b) => b && b.trim());
+  if (!bubbles.length) bubbles.push("im here");
   await sleep(humanDelayMs(bubbles[0]));
   await insertBubble(conversation_id, bubbles[0]);
   for (let i = 1; i < bubbles.length; i++) {
