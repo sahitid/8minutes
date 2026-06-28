@@ -178,7 +178,7 @@ export default function Survey() {
     const dropData = await dropRes.json().catch(() => ({}));
     setSubmitting(false);
     if (dropRes.status === 402) {
-      setSubmitError("you need at least 1 credit to talk. earn one by listening!");
+      setSubmitError("you're out of credits for now. everyone gets 1 free each week, or earn more by listening 💛");
       return;
     }
     if (!dropRes.ok || !dropData.request_id) {

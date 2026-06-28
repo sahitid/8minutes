@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/weekly-credits",
+      "schedule": "0 12 * * 1"
+    }
+  ]
+}

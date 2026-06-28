@@ -13,7 +13,11 @@ credit, or earn credits by being a listener.
 ## Features
 
 - Phone-number login (Supabase + Twilio SMS OTP)
-- Credit system (1 credit = 8 minutes of talking; earn 1 by listening)
+- Credit system (1 credit = 8 minutes of talking)
+  - Everyone gets 1 free credit per week, automatically (including existing
+    accounts). Want more sooner? Earn extra by listening; you still get your
+    weekly one either way. Granted by a weekly cron (`/api/cron/weekly-credits`,
+    scheduled in [`vercel.json`](vercel.json)).
 - 1-minute quiz that matches talkers to the best listener online now
 - Real-time 8-minute chat with a countdown and roles (talker / listener)
 - Anonymous "envelope" talk requests in your account
@@ -66,4 +70,4 @@ credit, or earn credits by being a listener.
 - Phone numbers are normalized to E.164 (a US `+1` prefix is assumed when no
   country code is given).
 
-&copy; 2025 Sahiti Dasari.
+&copy; 2026 Sahiti Dasari.

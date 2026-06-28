@@ -139,6 +139,9 @@ export default function Account() {
             <Link href="/survey" className="doodle-btn">talk (1 credit)</Link>
             <Link href="/listen" className="doodle-btn doodle-btn-outline">listen (earn credit)</Link>
           </div>
+          <p style={{ flexBasis: "100%", margin: "4px 0 0", fontSize: 12.5, color: "#5a5a5a", fontWeight: 700 }}>
+            everyone gets 1 free credit a week 🌱 want more sooner? earn extra by listening — you still get your weekly one either way.
+          </p>
         </section>
 
         {/* envelopes */}
