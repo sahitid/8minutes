@@ -6,7 +6,7 @@ module.exports = {
       fontFamily: {
         display: ['Space Grotesk', 'system-ui', 'sans-serif'],
         body: ['DM Sans', 'system-ui', 'sans-serif'],
-        sketch: ['Caveat', 'cursive'],
+        sketch: ['Walter Turncoat', 'cursive'],
       },
       colors: {
         paper: '#f9f6f0',

@@ -16,7 +16,7 @@
   --white: #fffcf7;
   --font-display: "Space Grotesk", system-ui, sans-serif;
   --font-body: "DM Sans", system-ui, sans-serif;
-  --font-sketch: "Caveat", cursive;
+  --font-sketch: "Walter Turncoat", cursive;
 }
 
 html,
@@ -213,7 +213,7 @@ html {
 
 .marker {
   font-family: var(--font-sketch);
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: 0.01em;
 }
 .display {
@@ -222,9 +222,9 @@ html {
   letter-spacing: -0.03em;
 }
 .brand {
-  font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-family: var(--font-sketch);
+  font-weight: 400;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
