@@ -2,10 +2,10 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useSupabase } from "../lib/supabase/context";
 
-const INK = "#1a1a1a";
-const NOTE_FILLS = ["#FCE7C8", "#D6E8D5", "#FBD5D5", "#fff"];
-const PIN_COLORS = ["#E58A8A", "#9CC79A", "#E8B873", "#E58A8A"];
-const ROTATIONS = ["-2deg", "1.5deg", "-1deg", "2deg", "-1.5deg", "1deg"];
+const INK = "#1c1917";
+const NOTE_FILLS = ["#f5e6c8", "#d9e4d4", "#f0d9d4", "#fffcf7"];
+const PIN_COLORS = ["#e8d56b", "#7a9a78", "#c4a84a", "#e8d56b"];
+const ROTATIONS = ["-1.5deg", "1.2deg", "-0.8deg", "1.6deg", "-1.2deg", "0.9deg"];
 
 export function Bulletin() {
   const { supabase, user } = useSupabase();
@@ -62,13 +62,13 @@ export function Bulletin() {
         textAlign: "center",
       }}
     >
-      <span className="marker" style={{ fontSize: 17, color: "#E8B873", fontWeight: 600 }}>
+      <span className="marker" style={{ fontSize: 22, color: "#c4a84a" }}>
         the bulletin
       </span>
-      <h2 className="marker" style={{ fontWeight: 700, fontSize: "clamp(28px,3.6vw,42px)", margin: "8px 0 8px" }}>
+      <h2 className="display" style={{ fontSize: "clamp(26px,3.4vw,40px)", margin: "8px 0 8px" }}>
         little notes from strangers
       </h2>
-      <p style={{ fontSize: 17, color: "#5a5a5a", margin: "0 0 32px" }}>
+      <p style={{ fontSize: 16, color: "#5c5650", margin: "0 0 32px", fontWeight: 400 }}>
         pin a bit of kindness for whoever needs it next.
       </p>
 
@@ -82,70 +82,52 @@ export function Bulletin() {
             onChange={(e) => setBody(e.target.value)}
             maxLength={140}
             placeholder="pin a kind note (140 chars)"
+            className="doodle-input"
             style={{
               flex: "1 1 280px",
               minWidth: 0,
-              background: "#fff",
-              border: `2.5px solid ${INK}`,
-              borderRadius: 16,
-              padding: "12px 18px",
-              fontFamily: "'Nunito', sans-serif",
-              fontWeight: 700,
-              fontSize: 15,
-              color: INK,
-              boxShadow: `3px 3px 0 #D6E8D5`,
             }}
           />
           <button
             type="submit"
             disabled={posting}
-            className="hard-link-sm marker"
+            className="doodle-btn hard-link-sm"
             style={{
-              cursor: "pointer",
-              background: "#FBD5D5",
-              border: `2.5px solid ${INK}`,
-              borderRadius: 16,
               padding: "12px 22px",
-              fontWeight: 700,
-              fontSize: 17,
-              color: INK,
-              boxShadow: `3px 3px 0 ${INK}`,
-              transition: "transform .15s ease, box-shadow .15s ease",
+              fontSize: 15,
             }}
           >
             {posting ? "pinning..." : "pin it"}
           </button>
         </form>
       ) : (
-        <p style={{ fontSize: 15, color: "#5a5a5a", margin: "0 0 40px", fontWeight: 700 }}>
-          <Link href="/login" style={{ color: "#E58A8A" }}>
+        <p style={{ fontSize: 15, color: "#5c5650", margin: "0 0 40px", fontWeight: 500 }}>
+          <Link href="/login" style={{ color: "#c4a84a" }}>
             sign in
           </Link>{" "}
           to pin your own note.
         </p>
       )}
 
-      {/* the cork board */}
       <div
         style={{
           position: "relative",
           maxWidth: 960,
           margin: "0 auto",
-          border: "12px solid #7a4a24",
-          borderRadius: 16,
-          background: "#c79a52",
+          border: `1.5px solid ${INK}`,
+          borderRadius: 28,
+          background: "#e8dcc4",
           backgroundImage:
-            "radial-gradient(rgba(0,0,0,0.16) 1.6px, transparent 1.6px), radial-gradient(rgba(255,255,255,0.10) 1.6px, transparent 1.6px)",
+            "radial-gradient(rgba(28,25,23,0.08) 1.2px, transparent 1.2px), radial-gradient(rgba(255,255,255,0.18) 1.2px, transparent 1.2px)",
           backgroundSize: "14px 14px, 14px 14px",
           backgroundPosition: "0 0, 7px 7px",
-          boxShadow:
-            "8px 8px 0 #1a1a1a, inset 0 0 50px rgba(0,0,0,0.28), inset 0 0 0 3px rgba(0,0,0,0.15)",
+          boxShadow: "0 12px 32px rgba(28,25,23,0.08)",
           padding: "40px 26px",
           minHeight: 200,
         }}
       >
         {posts.length === 0 ? (
-          <p className="marker" style={{ color: "#fff8ee", fontWeight: 600, fontSize: 18, textShadow: "1px 1px 0 rgba(0,0,0,0.3)" }}>
+          <p className="marker" style={{ color: "#5c5650", fontSize: 20 }}>
             no notes pinned yet. be the first to leave a little kindness.
           </p>
         ) : (
@@ -158,31 +140,31 @@ export function Bulletin() {
                   breakInside: "avoid",
                   marginBottom: 26,
                   background: NOTE_FILLS[i % NOTE_FILLS.length],
-                  borderRadius: 3,
+                  border: `1.5px solid ${INK}`,
+                  borderRadius: 6,
                   padding: "26px 18px 16px",
-                  boxShadow: "2px 5px 10px rgba(0,0,0,0.32)",
+                  boxShadow: "0 6px 16px rgba(28,25,23,0.08)",
                   transform: `rotate(${ROTATIONS[i % ROTATIONS.length]})`,
                 }}
               >
-                {/* push pin */}
                 <span
                   style={{
                     position: "absolute",
                     top: -10,
                     left: "50%",
                     transform: "translateX(-50%)",
-                    width: 20,
-                    height: 20,
+                    width: 18,
+                    height: 18,
                     borderRadius: "50%",
-                    background: `radial-gradient(circle at 34% 30%, #ffffffcc, ${PIN_COLORS[i % PIN_COLORS.length]} 60%, rgba(0,0,0,0.4))`,
-                    border: `2px solid ${INK}`,
-                    boxShadow: "1px 3px 4px rgba(0,0,0,0.35)",
+                    background: `radial-gradient(circle at 34% 30%, #ffffffcc, ${PIN_COLORS[i % PIN_COLORS.length]} 60%, rgba(0,0,0,0.35))`,
+                    border: `1.5px solid ${INK}`,
+                    boxShadow: "1px 2px 4px rgba(0,0,0,0.2)",
                   }}
                 />
-                <p style={{ fontSize: 15.5, lineHeight: 1.5, color: "#2a2a2a", margin: 0, fontWeight: 700 }}>
+                <p style={{ fontSize: 15, lineHeight: 1.5, color: "#2a2a2a", margin: 0, fontWeight: 500 }}>
                   {post.body}
                 </p>
-                <p className="marker" style={{ marginTop: 12, fontSize: 14, color: "#6a5a44", fontWeight: 500 }}>
+                <p className="marker" style={{ marginTop: 12, fontSize: 16, color: "#6a5a44" }}>
                   love, {post.display_name}
                 </p>
               </div>

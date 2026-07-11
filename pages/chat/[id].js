@@ -6,7 +6,7 @@ import HeadObject from "../../components/head";
 import { useSupabase } from "../../lib/supabase/context";
 import { checkMessage, STRIKE_LIMIT } from "../../lib/moderation";
 
-const INK = "#1a1a1a";
+const INK = "#1c1917";
 
 const HOUSE_RULES = [
   { emoji: "🌷", text: "be kind. this is someone's real moment." },
@@ -222,21 +222,21 @@ export default function ChatRoom() {
       <main style={{ display: "flex", justifyContent: "center", padding: "16px 16px 32px" }}>
         <div className="doodle-card" style={{ width: "100%", maxWidth: 640, display: "flex", flexDirection: "column", height: "76vh", padding: 0, overflow: "hidden" }}>
           {/* header */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", borderBottom: `3px solid ${INK}`, background: "#FCE7C8" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", borderBottom: `1.5px solid ${INK}`, background: "#f5e6c8" }}>
             <div>
               <p className="marker" style={{ fontWeight: 700, fontSize: 18, margin: 0, display: "flex", alignItems: "center", gap: 7 }}>
                 {meta ? meta.partner_display_name : "connecting..."}
                 {meta?.ai_disclosed ? (
-                  <span style={{ fontFamily: "'Nunito',sans-serif", fontSize: 10.5, fontWeight: 800, color: "#5a5a5a", border: `2px solid ${INK}`, borderRadius: 20, padding: "1px 7px" }}>AI companion</span>
+                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 10.5, fontWeight: 600, color: "#5c5650", border: `1.5px solid ${INK}`, borderRadius: 20, padding: "1px 7px" }}>AI companion</span>
                 ) : null}
               </p>
               <p style={{ fontSize: 12, color: "#5a5a5a", margin: 0, fontWeight: 700 }}>{meta ? `you are the ${meta.role}` : ""}</p>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <span className="marker" style={{ fontSize: 16, fontWeight: 700, padding: "4px 12px", borderRadius: 20, border: `2.5px solid ${INK}`, background: lowTime ? "#FBD5D5" : "#fff", color: lowTime ? "#c0392b" : INK }}>
+              <span className="marker" style={{ fontSize: 16, fontWeight: 700, padding: "4px 12px", borderRadius: 20, border: `1.5px solid ${INK}`, background: lowTime ? "#f0d9d4" : "#fff", color: lowTime ? "#c0392b" : INK }}>
                 {remaining !== null ? formatTime(remaining) : "8:00"}
               </span>
-              <button onClick={reportConversation} disabled={reported} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'Nunito',sans-serif", fontWeight: 700, fontSize: 12.5, color: "#9a5a5a" }} title="Report this conversation">
+              <button onClick={reportConversation} disabled={reported} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 12.5, color: "#9a5a5a" }} title="Report this conversation">
                 {reported ? "reported" : "report"}
               </button>
             </div>
@@ -250,7 +250,7 @@ export default function ChatRoom() {
               </p>
               <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
                 {HOUSE_RULES.map((r) => (
-                  <li key={r.text} style={{ display: "flex", alignItems: "center", gap: 12, border: `2.5px solid ${INK}`, borderRadius: 14, padding: "12px 14px", background: "#FBF8F3", boxShadow: `3px 3px 0 #FCE7C8` }}>
+                  <li key={r.text} style={{ display: "flex", alignItems: "center", gap: 12, border: `1.5px solid ${INK}`, borderRadius: 14, padding: "12px 14px", background: "#f9f6f0", boxShadow: "0 4px 12px rgba(28,25,23,0.05)" }}>
                     <span style={{ fontSize: 22 }}>{r.emoji}</span>
                     <span style={{ fontSize: 14.5, fontWeight: 700 }}>{r.text}</span>
                   </li>
@@ -272,7 +272,7 @@ export default function ChatRoom() {
               const mine = m.sender_id === user.id;
               return (
                 <div key={m.id} style={{ display: "flex", flexDirection: "column", alignItems: mine ? "flex-end" : "flex-start" }}>
-                  <div style={{ maxWidth: "75%", padding: "9px 15px", fontSize: 14.5, fontWeight: 600, border: `2.5px solid ${m.flagged ? "#c0392b" : INK}`, background: m.flagged ? "#FBD5D5" : mine ? "#FBD5D5" : "#fff", borderRadius: mine ? "16px 16px 4px 16px" : "16px 16px 16px 4px", boxShadow: `2px 2px 0 ${m.flagged ? "#c0392b" : INK}` }}>
+                  <div style={{ maxWidth: "75%", padding: "9px 15px", fontSize: 14.5, fontWeight: 500, border: `1.5px solid ${m.flagged ? "#c0392b" : INK}`, background: m.flagged ? "#f0d9d4" : mine ? "#e8d56b" : "#fff", borderRadius: mine ? "18px 18px 4px 18px" : "18px 18px 18px 4px", boxShadow: "0 4px 12px rgba(28,25,23,0.05)" }}>
                     {m.content}
                   </div>
                   {m.flagged ? (
@@ -283,7 +283,7 @@ export default function ChatRoom() {
             })}
             {aiTyping ? (
               <div style={{ display: "flex", justifyContent: "flex-start" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "11px 15px", border: `2.5px solid ${INK}`, background: "#fff", borderRadius: "16px 16px 16px 4px", boxShadow: `2px 2px 0 ${INK}` }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "11px 15px", border: `1.5px solid ${INK}`, background: "#fff", borderRadius: "16px 16px 16px 4px", boxShadow: "0 4px 12px rgba(28,25,23,0.05)" }}>
                   {[0, 1, 2].map((n) => (
                     <span key={n} style={{ width: 7, height: 7, borderRadius: "50%", background: INK, animation: `popPulse 1.2s ease-in-out infinite ${n * 0.2}s` }} />
                   ))}
@@ -294,7 +294,7 @@ export default function ChatRoom() {
 
           {/* composer / end state */}
           {ended ? (
-            <div style={{ padding: "20px", borderTop: `3px solid ${INK}`, textAlign: "center", background: reported ? "#FBD5D5" : "#D6E8D5" }}>
+            <div style={{ padding: "20px", borderTop: `1.5px solid ${INK}`, textAlign: "center", background: reported ? "#f0d9d4" : "#d9e4d4" }}>
               {reported ? (
                 <>
                   <p style={{ fontSize: 14.5, margin: "0 0 6px", fontWeight: 700 }}>thanks for flagging this 🙏</p>
@@ -314,7 +314,7 @@ export default function ChatRoom() {
               </div>
             </div>
           ) : (
-            <div style={{ borderTop: `3px solid ${INK}` }}>
+            <div style={{ borderTop: `1.5px solid ${INK}` }}>
               {warning ? (
                 <div style={{ padding: "9px 14px", background: "#FBE3C8", borderBottom: `2px dashed ${INK}`, fontSize: 13, fontWeight: 700, color: "#8a4a1a", textAlign: "center" }}>
                   {warning}{strikes > 0 ? ` (${strikes}/${STRIKE_LIMIT})` : ""}

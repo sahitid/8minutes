@@ -4,7 +4,7 @@ import Nav from "../components/nav";
 import HeadObject from "../components/head";
 import { useSupabase } from "../lib/supabase/context";
 
-const INK = "#1a1a1a";
+const INK = "#1c1917";
 
 export default function Login() {
   const router = useRouter();
@@ -63,9 +63,9 @@ export default function Login() {
       <main style={{ display: "flex", justifyContent: "center", padding: "48px 20px 80px" }}>
         <div className="doodle-card" style={{ width: "100%", maxWidth: 420, padding: 32, transform: "rotate(-0.6deg)" }}>
           <div style={{ textAlign: "center", marginBottom: 24 }}>
-            <div style={{ margin: "0 auto 12px", display: "grid", placeItems: "center", width: 60, height: 60, borderRadius: "55% 50% 52% 48%", border: `3px solid ${INK}`, background: "#FBD5D5", fontSize: 28, transform: "rotate(-4deg)" }}>💌</div>
-            <h1 className="marker" style={{ fontWeight: 700, fontSize: 28, margin: 0 }}>welcome to 8 minutes</h1>
-            <p style={{ fontSize: 14.5, color: "#5a5a5a", marginTop: 6 }}>
+            <div style={{ margin: "0 auto 12px", display: "grid", placeItems: "center", width: 60, height: 60, borderRadius: "50%", border: `1.5px solid ${INK}`, background: "#e8d56b", fontSize: 28, transform: "rotate(-4deg)" }}>💌</div>
+            <h1 className="display" style={{ fontSize: 26, margin: 0 }}>welcome to 8 minutes</h1>
+            <p style={{ fontSize: 14.5, color: "#5c5650", marginTop: 6, fontWeight: 400 }}>
               {step === "phone" ? "sign in with your phone number" : `we sent a code to ${normalizePhone(phone)}`}
             </p>
           </div>
@@ -107,7 +107,7 @@ export default function Login() {
                   setCode("");
                   setError("");
                 }}
-                style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'Nunito',sans-serif", fontWeight: 700, fontSize: 14, color: "#5a5a5a" }}
+                style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 14, color: "#5a5a5a" }}
               >
                 use a different number
               </button>

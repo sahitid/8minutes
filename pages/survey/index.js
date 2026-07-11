@@ -5,13 +5,13 @@ import { useState, useEffect } from "react";
 import { ReactLenis, useLenis } from "lenis/dist/lenis-react";
 import { useSupabase } from "../../lib/supabase/context";
 
-const INK = "#1a1a1a";
+const INK = "#1c1917";
 
 const SINGLE_QUESTIONS = [
   {
     id: "need",
     title: "1. what do you need right now?",
-    fill: "#FBD5D5",
+    fill: "#f0d9d4",
     options: [
       { value: "vent", label: "to vent" },
       { value: "heard", label: "to feel heard" },
@@ -26,7 +26,7 @@ const SINGLE_QUESTIONS = [
   {
     id: "mood",
     title: "2. how are you feeling today?",
-    fill: "#D6E8D5",
+    fill: "#d9e4d4",
     options: [
       { value: "good", label: "pretty good" },
       { value: "excited", label: "excited" },
@@ -41,7 +41,7 @@ const SINGLE_QUESTIONS = [
   {
     id: "vibe",
     title: "3. what's your vibe?",
-    fill: "#FCE7C8",
+    fill: "#f5e6c8",
     options: [
       { value: "chill", label: "chill & easy" },
       { value: "deep", label: "deep & thoughtful" },
@@ -52,7 +52,7 @@ const SINGLE_QUESTIONS = [
   {
     id: "pref",
     title: "4. right now, do you want to...",
-    fill: "#FBD5D5",
+    fill: "#f0d9d4",
     options: [
       { value: "talk", label: "mostly talk" },
       { value: "listen", label: "mostly listen" },
@@ -62,7 +62,7 @@ const SINGLE_QUESTIONS = [
   {
     id: "depth",
     title: "5. how heavy is it on you?",
-    fill: "#D6E8D5",
+    fill: "#d9e4d4",
     options: [
       { value: "light", label: "light & breezy" },
       { value: "medium", label: "somewhere in between" },
@@ -82,8 +82,8 @@ const cardBase = {
   maxWidth: 640,
   margin: "auto",
   background: "#fff",
-  border: `3px solid ${INK}`,
-  boxShadow: `6px 6px 0 ${INK}`,
+  border: `1.5px solid ${INK}`,
+  boxShadow: "0 10px 28px rgba(28,25,23,0.06)",
   padding: 32,
 };
 
@@ -93,15 +93,16 @@ function optionStyle(selected, fill) {
     alignItems: "center",
     gap: 10,
     cursor: "pointer",
-    border: `2.5px solid ${INK}`,
+    border: `1.5px solid ${INK}`,
     borderRadius: 14,
     padding: "11px 15px",
-    fontWeight: 700,
     fontSize: 15.5,
-    background: selected ? fill : "#FBF8F3",
-    boxShadow: selected ? `1px 1px 0 ${INK}` : `3px 3px 0 ${fill}`,
-    transform: selected ? "translate(2px,2px)" : "none",
+    background: selected ? fill : "#f9f6f0",
+    boxShadow: selected ? "none" : "0 4px 12px rgba(28,25,23,0.04)",
+    transform: selected ? "translateY(1px)" : "none",
     transition: "transform .1s ease, box-shadow .1s ease, background .1s ease",
+    fontFamily: "'DM Sans', sans-serif",
+    fontWeight: 500,
   };
 }
 
@@ -256,17 +257,17 @@ export default function Survey() {
                         disabled={disabled}
                         style={{
                           cursor: disabled ? "not-allowed" : "pointer",
-                          fontFamily: "'Nunito', sans-serif",
-                          background: on ? "#FCE7C8" : "#fff",
-                          border: `2.5px solid ${INK}`,
+                          fontFamily: "'DM Sans', sans-serif",
+                          background: on ? "#f5e6c8" : "#fff",
+                          border: `1.5px solid ${INK}`,
                           borderRadius: 30,
                           padding: "9px 16px",
-                          fontWeight: 700,
+                          fontWeight: 500,
                           fontSize: 14.5,
                           color: INK,
                           opacity: disabled ? 0.45 : 1,
-                          boxShadow: on ? `1px 1px 0 ${INK}` : `3px 3px 0 #FCE7C8`,
-                          transform: on ? "translate(2px,2px)" : "none",
+                          boxShadow: on ? "none" : "0 4px 12px rgba(28,25,23,0.04)",
+                          transform: on ? "translateY(1px)" : "none",
                           transition: "transform .1s ease, box-shadow .1s ease",
                         }}
                       >
@@ -279,7 +280,7 @@ export default function Survey() {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, marginTop: 40 }}>
-              {submitError ? <p style={{ color: "#E58A8A", fontSize: 14.5, fontWeight: 700, textAlign: "center" }}>{submitError}</p> : null}
+              {submitError ? <p style={{ color: "#c45c5c", fontSize: 14.5, fontWeight: 600, textAlign: "center" }}>{submitError}</p> : null}
               <button disabled={submitting} className="doodle-btn" style={{ fontSize: 21, padding: "15px 30px" }} onClick={submitForm}>
                 {submitting ? "sending your envelope..." : "send my envelope 💌"}
               </button>

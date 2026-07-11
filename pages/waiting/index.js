@@ -4,7 +4,7 @@ import Nav from "../../components/nav";
 import HeadObject from "../../components/head";
 import { useSupabase } from "../../lib/supabase/context";
 
-const INK = "#1a1a1a";
+const INK = "#1c1917";
 
 // Only fall back to the AI when literally no human listener is online. As long
 // as people are around, we keep waiting so real humans get paired together.
@@ -80,7 +80,7 @@ export default function Waiting() {
       <Nav />
 
       <main style={{ display: "flex", justifyContent: "center", padding: "60px 20px" }}>
-        <div className="doodle-card" style={{ width: "100%", maxWidth: 480, textAlign: "center", padding: 40, background: "#FCE7C8", transform: "rotate(-0.6deg)" }}>
+        <div className="doodle-card" style={{ width: "100%", maxWidth: 480, textAlign: "center", padding: 40, background: "#f5e6c8", transform: "rotate(-0.6deg)" }}>
           {/* floating envelope */}
           <div style={{ fontSize: 64, marginBottom: 8, animation: "floatY 3s ease-in-out infinite" }}>💌</div>
 
@@ -97,14 +97,14 @@ export default function Waiting() {
                 we&apos;re waiting for a listener to open it. hang tight, this won&apos;t take your credit until someone says yes.
               </p>
 
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "#fff", border: `2.5px solid ${INK}`, borderRadius: 30, padding: "10px 18px", boxShadow: `3px 3px 0 ${INK}`, marginBottom: 22 }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "#fff", border: `1.5px solid ${INK}`, borderRadius: 30, padding: "10px 18px", boxShadow: "0 6px 16px rgba(28,25,23,0.06)", marginBottom: 22 }}>
                 {listeners === null ? (
                   <span style={{ fontWeight: 700, color: "#5a5a5a" }}>checking who&apos;s around...</span>
                 ) : listeners > 0 ? (
                   <>
                     <span style={{ position: "relative", display: "inline-flex", width: 11, height: 11 }}>
-                      <span style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "#9CC79A", opacity: 0.6, animation: "popPulse 1.4s ease-in-out infinite" }} />
-                      <span style={{ position: "relative", width: 11, height: 11, borderRadius: "50%", background: "#9CC79A", border: `2px solid ${INK}` }} />
+                      <span style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "#7a9a78", opacity: 0.6, animation: "popPulse 1.4s ease-in-out infinite" }} />
+                      <span style={{ position: "relative", width: 11, height: 11, borderRadius: "50%", background: "#7a9a78", border: `2px solid ${INK}` }} />
                     </span>
                     <span style={{ fontWeight: 800 }}>{listeners} {listeners === 1 ? "person is" : "people are"} listening right now</span>
                   </>

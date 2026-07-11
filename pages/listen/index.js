@@ -4,7 +4,7 @@ import Nav from "../../components/nav";
 import HeadObject from "../../components/head";
 import { useSupabase } from "../../lib/supabase/context";
 
-const INK = "#1a1a1a";
+const INK = "#1c1917";
 
 const NEED_LABEL = {
   vent: "needs to vent", heard: "wants to feel heard", advice: "wants advice",
@@ -15,7 +15,7 @@ const MOOD_LABEL = {
   good: "feeling good", excited: "excited", neutral: "just okay", tired: "tired",
   low: "feeling low", lonely: "lonely", anxious: "anxious", stressed: "stressed",
 };
-const FILLS = ["#FBD5D5", "#D6E8D5", "#FCE7C8"];
+const FILLS = ["#f0d9d4", "#d9e4d4", "#f5e6c8"];
 const ROTS = ["-1deg", "1deg", "-0.6deg", "0.8deg"];
 
 export default function Listen() {
@@ -104,7 +104,7 @@ export default function Listen() {
         </div>
 
         {error ? (
-          <p style={{ textAlign: "center", color: "#E58A8A", fontWeight: 700, marginTop: 16 }}>{error}</p>
+          <p style={{ textAlign: "center", color: "#c45c5c", fontWeight: 600, marginTop: 16 }}>{error}</p>
         ) : null}
 
         {loadingBoard ? (
@@ -120,7 +120,7 @@ export default function Listen() {
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 18, marginTop: 24 }}>
             {envelopes.map((env, i) => (
-              <div key={env.id} style={{ background: FILLS[i % FILLS.length], border: `3px solid ${INK}`, borderRadius: "22px 18px 24px 16px", boxShadow: `6px 6px 0 ${INK}`, padding: 22, transform: `rotate(${ROTS[i % ROTS.length]})`, display: "flex", flexDirection: "column", gap: 12 }}>
+              <div key={env.id} style={{ background: FILLS[i % FILLS.length], border: `1.5px solid ${INK}`, borderRadius: "22px 18px 24px 16px", boxShadow: "0 10px 28px rgba(28,25,23,0.06)", padding: 22, transform: `rotate(${ROTS[i % ROTS.length]})`, display: "flex", flexDirection: "column", gap: 12 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <span style={{ fontSize: 28 }}>✉️</span>
                   <div>
