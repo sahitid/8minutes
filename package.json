@@ -12,7 +12,7 @@
     "@supabase/supabase-js": "^2.108.2",
     "ai": "^6.0.209",
     "classnames": "^2.3.2",
-    "framer-motion": "^12.6.3",
+    "framer-motion": "^12.23.24",
     "lenis": "^1.1.19",
     "next": "^14.0.4",
     "next-themes": "^0.3.0",
